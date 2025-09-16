@@ -1,16 +1,6 @@
 #include "token.h"
 
-int	is_pipe(t_lexem *head, t_cursor *cursor)
-{
-	t_token	token;
-
-	token = get_token(cursor->input[cursor->position]);
-	head = create_node(head, token, ft_substr(cursor->input, cursor->position, 1));
-	switch_token(token, cursor);
-	return (cursor->position++);
-}
-
-int	is_double_quote(t_lexem *head, t_cursor *cursor)
+int	is_pipe_quotes(t_lexem *head, t_cursor *cursor)
 {
 	t_token	token;
 
@@ -42,11 +32,11 @@ int	is_word(t_lexem *head, t_cursor *cursor)
 	}
 	else
 	{
-		index = get_index(cursor->position, cursor->input, ' ')-cursor->position;
+		index = get_space(cursor->position, cursor->input)-cursor->position;
 		head = create_node(head, token, ft_substr(cursor->input, cursor->position, index));
-		return (switch_token(token, cursor), index+cursor->position+1);
+		return (switch_token(token, cursor), index+1);
 	}	
-	return (switch_token(token, cursor), index+cursor->position-1);	
+	return (switch_token(token, cursor), index-1);	
 }
 
 int	is_great(t_lexem *head, t_cursor *cursor)
@@ -83,17 +73,6 @@ int	is_less(t_lexem *head, t_cursor *cursor)
 	return (position+1);
 }
 
-int	is_quote(t_lexem *head, t_cursor *cursor)
-{
-t_token	token;
-
-	token = get_token(cursor->input[cursor->position]);
-	head = create_node(head, token, ft_substr(cursor->input, cursor->position, 1));
-	switch_token(token, cursor);
-	return (cursor->position++);
-
-}
-
 int	get_index(int position, char *s, char c)
 {
 	while (s[position])
@@ -103,4 +82,15 @@ int	get_index(int position, char *s, char c)
 		position++;
 	}
 	return (-1);
+}
+
+int	get_space(int position, char *s)
+{
+	while (s[position])
+	{
+		if (s[position] == ' ')
+			return (position);
+		position++;
+	}
+	return (ft_strlen(s));
 }

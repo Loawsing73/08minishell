@@ -30,7 +30,7 @@ t_lexem	*create_node(t_lexem *head, t_token token, char *input)
 
 	node = malloc(sizeof(t_lexem));
 	node->token = token;
-	node->input = input;
+	node->input = ft_strdup(input);
 	node->next = NULL;
 	if (head)
 	{
@@ -38,7 +38,8 @@ t_lexem	*create_node(t_lexem *head, t_token token, char *input)
 		head = node;
 		return (head);
 	}
-	return (node);
+	head = node;
+	return (head);
 }
 
 //
@@ -54,19 +55,15 @@ t_lexem *parsing_input(t_cursor *cursor, char *input)
 	{
 		while (cursor->input[cursor->position] == '\t' || cursor->input[cursor->position] == ' ')
 			cursor->position++;
-		if (cursor->input[cursor->position] == '|')	
-			cursor->position = is_pipe(head, cursor);
-		else if (cursor->input[cursor->position] == '"')
-			cursor->position = is_double_quote(head, cursor);
-		else if (cursor->input[cursor->position] == '\'')
-			cursor->position = is_quote(head, cursor);
+		if (cursor->input[cursor->position] == '|' || cursor->input[cursor->position] == '\'' || cursor->input[cursor->position] == '"')	
+			cursor->position += is_pipe_quotes(head, cursor);
 		else if (cursor->input[cursor->position] == '>')
-			cursor->position = is_great(head, cursor);
+			cursor->position += is_great(head, cursor);
 		else if (cursor->input[cursor->position] == '<')
-			cursor->position = is_less(head, cursor);
+			cursor->position += is_less(head, cursor);
 		else
 		{	
-			cursor->position = is_word(head, cursor);
+			cursor->position += is_word(head, cursor);
 			
 		}
 	}
@@ -87,6 +84,7 @@ int	main()
 	head = parsing_input(cursor, input);
 	while (head)
 	{
+		write(1, "oue", 3);
 		printf("%s - ", head->input);
 		printf("%u -> ", head->token);
 		head = head->next;	
