@@ -2,39 +2,31 @@
 
 t_token	get_token(char c)
 {
-	if (!s)
+	if (!c)
 		return (ERROR);
-//	if (s[0] == '\'')
-//		return (QUOTE);
-//	else if (s[0] == '"')
-//		return (DOUBLE_QUOTE);
+	if (c == '\'')
+		return (QUOTE);
+	else if (c == '"')
+		return (DOUBLE_QUOTE);
 	else if (c == '<')
-	{	
-		if (s[1] == '<')
-			return (D_LESS);
 		return (LESS);
-	}
 	else if (c == '>')
-	{
-		if (s[1] == '>')
-			return (D_GREAT);
 		return (GREAT);
-	}
 	else if (c == '|')
 		return (PIPE);
 	else
-		return (WORD);
+		return (ERROR);
 }
 //
 void	switch_token(t_token token, t_cursor *cursor)
 {
-	cursor->prev = cursor->current;
+	cursor->previous = cursor->current;
 	cursor->current = token;
 }
 //
-t_lexem	create_node(t_lexem *head, t_token token, char *input)
+t_lexem	*create_node(t_lexem *head, t_token token, char *input)
 {
-	t_lexm	*node;
+	t_lexem	*node;
 
 	node = malloc(sizeof(t_lexem));
 	node->token = token;
@@ -50,28 +42,35 @@ t_lexem	create_node(t_lexem *head, t_token token, char *input)
 }
 
 //
-	parsing_input(t_cursor *cursor, char *input)
+t_lexem *parsing_input(t_cursor *cursor, char *input)
 {
 	t_lexem	*head;
 
-	cursor->input = ft_strdup(intput);
+	cursor->input = ft_strdup(input);
 	cursor->position = 0;
 	cursor->current = ERROR;
+	head = NULL;
 	while (cursor->input[cursor->position])
 	{
-		if (cursor->input[cursor->position] == '|')
-			is_pipe(head, cursor);
+		while (cursor->input[cursor->position] == '\t' || cursor->input[cursor->position] == ' ')
+			cursor->position++;
+		if (cursor->input[cursor->position] == '|')	
+			cursor->position = is_pipe(head, cursor);
 		else if (cursor->input[cursor->position] == '"')
-			
+			cursor->position = is_double_quote(head, cursor);
 		else if (cursor->input[cursor->position] == '\'')
-			
+			cursor->position = is_quote(head, cursor);
 		else if (cursor->input[cursor->position] == '>')
-			
+			cursor->position = is_great(head, cursor);
 		else if (cursor->input[cursor->position] == '<')
+			cursor->position = is_less(head, cursor);
+		else
+		{	
+			cursor->position = is_word(head, cursor);
 			
-		current->position++;
+		}
 	}
-
+	return (head);
 }	
 //
 
@@ -80,10 +79,16 @@ t_lexem	create_node(t_lexem *head, t_token token, char *input)
 int	main()
 {
 	
-	int		i = 0;
-	char	*input;
-	t_token	token;
+	char		*input;
+	t_lexem		*head;
+	t_cursor	*cursor;
 
 	input = readline("enter : ");
-
+	head = parsing_input(cursor, input);
+	while (head)
+	{
+		printf("%s - ", head->input);
+		printf("%u -> ", head->token);
+		head = head->next;	
+	}
 }
