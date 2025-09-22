@@ -15,12 +15,10 @@ typedef	enum e_token
 	D_GREAT,
 	LESS,
 	GREAT,
-	NL,
 	PIPE,
 	QUOTE,
 	DOUBLE_QUOTE,
 	ERROR,
-	ENDOF
 }	t_token;
 
 typedef struct	s_lexem
@@ -42,15 +40,17 @@ char	**ft_split(char const *s, char c);
 size_t	ft_strlen(char *s);
 char	*ft_strdup(char *s1);
 
-int	is_pipe_quotes(t_lexem *head, t_cursor *cursor);
-int	is_word(t_lexem *head, t_cursor *cursor);
-int	is_great(t_lexem *head, t_cursor *cursor);
-int	is_less(t_lexem *head, t_cursor *cursor);
+int	is_pipe_quotes(t_lexem **head, t_cursor *cursor);
+int	is_word(t_lexem **head, t_cursor *cursor);
+int	is_great(t_lexem **head, t_cursor *cursor);
+int	is_less(t_lexem **head, t_cursor *cursor);
 int	get_index(int position, char *s, char c);
+int	valid_input(char *input);
 t_token	get_token(char c);
 void	switch_token(t_token token, t_cursor *cursor);
 t_lexem	*create_node(t_lexem *head, t_token token, char *input);
 t_lexem *parsing_input(t_cursor *cursor, char *input);
 int	get_space(int position, char *s);
-
+void free_lexem_list(t_lexem *head);
+		
 #endif
