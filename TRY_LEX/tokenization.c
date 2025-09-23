@@ -1,6 +1,6 @@
 #include "token.h"
 
-int	is_pipe_quotes(t_lexem **head, t_cursor *cursor)
+int	is_pipe_quotes_exp(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
 
@@ -16,12 +16,12 @@ int	is_word(t_lexem **head, t_cursor *cursor)
 	int	index;
 
 	token = WORD;
-	if (cursor->current == DOUBLE_QUOTE && get_index(cursor->position, cursor->input, '"') > -1)
+	if ((cursor->current == DOUBLE_QUOTE || cursor->current == EXPAND) && get_index(cursor->position, cursor->input, '"') > -1)
 	{	
 		index = (get_index(cursor->position, cursor->input, '"')-cursor->position);
 		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, index));
 	}
-	else if (cursor->current == QUOTE && get_index(cursor->position, cursor->input, '\'') > -1)
+	else if ((cursor->current == QUOTE || cursor->current == EXPAND) && get_index(cursor->position, cursor->input, '\'') > -1)
 	{	
 		index = (get_index(cursor->position, cursor->input, '\'')-cursor->position);
 		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, index));
@@ -114,6 +114,8 @@ t_token	get_token(char c)
 		return (GREAT);
 	else if (c == '|')
 		return (PIPE);
+	else if (c == '$')
+		return (EXPAND);
 	else
 		return (ERROR);
 }
@@ -157,8 +159,8 @@ t_lexem *parsing_input(t_cursor *cursor, char *input)
 	{
 		while (cursor->input[cursor->position] == '\t' || cursor->input[cursor->position] == ' ')
 			cursor->position++;
-		if (cursor->input[cursor->position] == '|' || cursor->input[cursor->position] == '\'' || cursor->input[cursor->position] == '"')	
-			cursor->position += is_pipe_quotes(&head, cursor);
+		if (cursor->input[cursor->position] == '|' || cursor->input[cursor->position] == '\'' || cursor->input[cursor->position] == '"' || cursor->input[cursor->position] == '$')
+			cursor->position += is_pipe_quotes_exp(&head, cursor);
 		else if (cursor->input[cursor->position] == '>')
 			cursor->position += is_great(&head, cursor);
 		else if (cursor->input[cursor->position] == '<')

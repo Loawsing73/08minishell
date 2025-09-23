@@ -13,7 +13,7 @@ static int	special_caract(char *input)
 	{
 		if (input[i] == '\\' || input[i] == ';' || input[i] == '*' ||
 			input[i] == '[' || input[i] == ']' || input[i] == '(' ||
-			input[i] == '#' || input[i] == '-' || input[i] == '=' ||
+			input[i] == '#' || input[i] == '=' ||
 			input[i] == '%' || input[i] == '!')
 			return (0);
 		i++;

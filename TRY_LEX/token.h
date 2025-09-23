@@ -18,7 +18,8 @@ typedef	enum e_token
 	PIPE,
 	QUOTE,
 	DOUBLE_QUOTE,
-	ERROR,
+	EXPAND,
+	ERROR
 }	t_token;
 
 typedef struct	s_lexem
@@ -40,7 +41,7 @@ char	**ft_split(char const *s, char c);
 size_t	ft_strlen(char *s);
 char	*ft_strdup(char *s1);
 
-int	is_pipe_quotes(t_lexem **head, t_cursor *cursor);
+int	is_pipe_quotes_exp(t_lexem **head, t_cursor *cursor);
 int	is_word(t_lexem **head, t_cursor *cursor);
 int	is_great(t_lexem **head, t_cursor *cursor);
 int	is_less(t_lexem **head, t_cursor *cursor);
