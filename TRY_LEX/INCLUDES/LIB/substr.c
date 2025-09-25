@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   substr.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erandjel <erandjel@student.s19.be>         +#+  +:+       +#+        */
+/*   By: erandjel <erandjel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/12 12:00:44 by erandjel          #+#    #+#             */
-/*   Updated: 2025/09/12 12:00:47 by erandjel         ###   ########.fr       */
+/*   Updated: 2025/09/25 19:18:14 by erandjel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../token.h"
 
-size_t	ft_strlen(char *s)
+int	ft_strlen(char *s)
 {
-	size_t	i;
+	int	i;
 
 	if (!s)
 		return (0);
@@ -24,10 +24,10 @@ size_t	ft_strlen(char *s)
 	return (i);
 }
 
-char	*ft_substr(char *s, size_t start, size_t len)
+char	*ft_substr(char *s, int start, int len)
 {
 	char	*sub;
-	size_t	i;
+	int	i;
 
 	if (!s)
 		return (NULL);
@@ -41,6 +41,8 @@ char	*ft_substr(char *s, size_t start, size_t len)
 	i = 0;
 	while (i < len)
 	{
+		if (s[start + i] < 0)
+			s[start + i] = -s[start + i];
 		sub[i] = s[start + i];
 		i++;
 	}

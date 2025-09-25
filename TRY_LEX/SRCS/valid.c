@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+#include "../INCLUDES/token.h"
 
 static int	special_caract(char *input)
 {

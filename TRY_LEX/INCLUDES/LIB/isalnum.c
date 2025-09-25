@@ -1,3 +1,5 @@
+#include "../token.h"
+
 int	ft_isalnum(int c)
 {
 	if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')

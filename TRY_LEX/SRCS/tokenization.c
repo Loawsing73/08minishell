@@ -1,6 +1,6 @@
-#include "token.h"
+#include "../INCLUDES/token.h"
 
-int	is_pipe_quotes(t_lexem **head, t_cursor *cursor)
+int	is_pipe(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
 
@@ -12,28 +12,37 @@ int	is_pipe_quotes(t_lexem **head, t_cursor *cursor)
 	return (1);
 }
 //
-int	is_word(t_lexem **head, t_cursor *cursor)
+int is_word(t_lexem **head, t_cursor *cu)
 {
-	t_token	token;
-	int	index;
-	int	pipe;
-	int	dquote;
-	int	quote;
-
+ 	t_token token;
+	int index;
+	int pipe;
+	int less;
+	int great;
+ 
 	token = WORD;
-	pipe = get_index(cursor->position, cursor->input, '|');
-	quote = get_index(cursor->position, cursor->input, '\'');
-	dquote = get_index(cursor->position, cursor->input, '"');
-	if ((quote < get_space(cursor->position, cursor->input) && quote < pipe && quote < dquote && quote > -1))
-		index = (quote-cursor->position);
-	else if ((dquote < get_space(cursor->position, cursor->input) && dquote < pipe && dquote < quote && dquote > -1))
-		index = (dquote-cursor->position);	
-	else if ((pipe < get_space(cursor->position, cursor->input) && pipe < quote && pipe < dquote && pipe > -1))
-		index = (pipe-cursor->position);
+ 	pipe = get_index(cu->position, cu->input, '|');
+ 	less = get_index(cu->position, cu->input, '<');
+ 	great = get_index(cu->position, cu->input, '>');
+	if (cu->current == LESS || cu->current == GREAT || cu->current == D_LESS || cu->current == D_GREAT)
+ 	{
+ 		token = IO_LOCA;
+ 		index = (get_space(cu->position, cu->input)-cu->position);
+	}
+	else if (cu->current == ERROR)
+ 		index = get_space(cu->position, cu->input)-cu->position;
+	else if (pipe < less && pipe < great && pipe > -1 && cu->current !=PIPE)
+ 		index = get_index(cu->position, cu->input, '|')-cu->position;
+	else if (less < pipe && less < great && less > -1)
+ 		index = get_index(cu->position, cu->input, '<')-cu->position;
+	else if (great < pipe && great < less && great > -1)
+ 		index = get_index(cu->position, cu->input, '>')-cu->position;
+	else if (cu->current == WORD && cu->position != 0)
+ 		index = ft_strlen(cu->input)-cu->position;
 	else
-		index = get_space(cursor->position, cursor->input)-cursor->position;
-	*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, index));
-	return (switch_token(token, cursor), index);	
+ 		index = get_space(cu->position, cu->input)-cu->position;
+	*head = create_node(*head, token, ft_substr(cu->input, cu->position, index));
+	return (switch_token(token, cu), index);
 }
 //
 int	is_less(t_lexem **head, t_cursor *cursor)
@@ -149,15 +158,14 @@ t_lexem *parsing_input(t_cursor *cursor, char *input)
 	cursor->input = ft_strdup(input);
 	cursor->position = 0;
 	cursor->previous = ERROR;
+	cursor->current = ERROR;
 	head = NULL;
 	while (cursor->input[cursor->position])
 	{
 		while (cursor->input[cursor->position] == '\t' || cursor->input[cursor->position] == ' ')
 			cursor->position++;
 		if (cursor->input[cursor->position] == '|')
-			cursor->position += is_pipe_quotes(&head, cursor);
-		else if (cursor->input[cursor->position] == '\'' || cursor->input[cursor->position] == '"')
-			cursor->position += is_pipe_quotes(&head, cursor);
+			cursor->position += is_pipe(&head, cursor);
 		else if (cursor->input[cursor->position] == '>')
 			cursor->position += is_great(&head, cursor);
 		else if (cursor->input[cursor->position] == '<')
@@ -190,27 +198,51 @@ int main(int ac, char **ag, char **env)
 	t_lexem *head;
 	t_lexem *current;
 	t_cursor cursor = {0};
-
-	input = readline("enter : ");
-	if (!input)
-		return (1);
-	if (valid_input(input))
+	
+	(void)ac;
+	(void)ag;
+	while (1)
 	{
-		joined = concate_hell(input, env);
-		printf("%s\n", joined);
-		head = parsing_input(&cursor, joined);
-			current = head;
-		while (current)
+		input = readline("enter : ");
+		if (!input)
+			return (1);
+		if (ft_strncmp(input, "exit", 4) == 0)
 		{
-			printf("Token: %u, Input: %s\n", current->token, current->input);
-			current = current->next;
+    		free(input);
+			break;
 		}
-		free_lexem_list(head);
-		free(cursor.input);
+		if (valid_input(ft_strtrim(input, " ")))
+		{
+			joined = concate_hell(input, env);
+			printf("%s\n", joined);
+			head = parsing_input(&cursor, joined);
+			current = head;
+			while (current)
+			{
+				printf("token = %u, input = %s\n", current->token, current->input);
+				current = current->next;
+			}
+			t_ast_node *ast = parse(head);
+			if (ast)
+			{
+				print_ast(ast, 0);
+				free_ast(ast);
+			}
+			else
+				printf("Erreur de parsing\n");
+			free_lexem_list(head);
+			free(joined);
+		}
+		else
+			printf("invalid input\n");
+		free(input);
+		cursor.position = 0;
+		cursor.current = ERROR;
+		if (cursor.input)
+		{
+			free(cursor.input);
+			cursor.input = NULL;
+		}
 	}
-	else
-		printf("invalid input\n");
-	free(input);
 	return (0);
 }
-
