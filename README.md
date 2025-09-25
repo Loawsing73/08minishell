@@ -1,6 +1,29 @@
-Dans DOC :
-  - shell_cmd_used : copier/coller de la grammaire de "Shell Command Language"
-  - tree_pemdas : prise en main des token et de la priorite des operations
+pipeline     -> command '|' pipeline
+pipeline     -> command
 
-Dans TRY :
-  - debut du parsing - mauvais raisonnement => refactor 
+command      -> word argument_list redirection_list
+argument_list -> argument argument_list
+argument_list -> ε (vide)
+
+argument     -> word
+argument     -> quoted_string
+
+redirection_list -> redirection redirection_list  
+redirection_list -> ε
+
+redirection  -> '<' word
+redirection  -> '>' word
+redirection  -> '<<' word
+redirection  -> '>>' word
+
+quoted_string -> QUOTE content QUOTE
+quoted_string -> DOUBLE_QUOTE content DOUBLE_QUOTE
+
+word         -> WORD
+
+
+
+test Nico:
+-expand $ -> rien
+-si $US (ou US existe pas) -> rien 
+->>> -> >> puis pas > comme token redirect
