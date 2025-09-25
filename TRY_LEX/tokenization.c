@@ -1,10 +1,12 @@
 #include "token.h"
 
-int	is_pipe_quotes_exp(t_lexem **head, t_cursor *cursor)
+int	is_pipe_quotes(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
 
 	token = get_token(cursor->input[cursor->position]);
+	if (token != PIPE)
+		token = WORD;
 	*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, 1));
 	switch_token(token, cursor);
 	return (1);
@@ -14,29 +16,23 @@ int	is_word(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
 	int	index;
+	int	pipe;
+	int	dquote;
+	int	quote;
 
 	token = WORD;
-	if ((cursor->current == DOUBLE_QUOTE || cursor->current == EXPAND) && get_index(cursor->position, cursor->input, '"') > -1)
-	{	
-		index = (get_index(cursor->position, cursor->input, '"')-cursor->position);
-		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, index));
-	}
-	else if ((cursor->current == QUOTE || cursor->current == EXPAND) && get_index(cursor->position, cursor->input, '\'') > -1)
-	{	
-		index = (get_index(cursor->position, cursor->input, '\'')-cursor->position);
-		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, index));
-	}
-	else if (cursor->current== LESS || cursor->current == GREAT || cursor->current == D_LESS || cursor->current == D_GREAT)
-	{	
-		token = IO_LOCA;
-		index = (get_space(cursor->position, cursor->input)-cursor->position);
-		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, index));
-	}
+	pipe = get_index(cursor->position, cursor->input, '|');
+	quote = get_index(cursor->position, cursor->input, '\'');
+	dquote = get_index(cursor->position, cursor->input, '"');
+	if ((quote < get_space(cursor->position, cursor->input) && quote < pipe && quote < dquote && quote > -1))
+		index = (quote-cursor->position);
+	else if ((dquote < get_space(cursor->position, cursor->input) && dquote < pipe && dquote < quote && dquote > -1))
+		index = (dquote-cursor->position);	
+	else if ((pipe < get_space(cursor->position, cursor->input) && pipe < quote && pipe < dquote && pipe > -1))
+		index = (pipe-cursor->position);
 	else
-	{
-		index = (get_space(cursor->position, cursor->input)-cursor->position);
-		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, index));
-	}	
+		index = get_space(cursor->position, cursor->input)-cursor->position;
+	*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, index));
 	return (switch_token(token, cursor), index);	
 }
 //
@@ -47,16 +43,18 @@ int	is_less(t_lexem **head, t_cursor *cursor)
 	
 	position = cursor->position;
 	token = get_token(cursor->input[position]);
-	if (get_token(cursor->input[position+1]) == token)
+	if (get_token(cursor->input[position +1]) == token)
 	{		
 		token = D_LESS;
 		position++;
 		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, 2));
+		return (switch_token(token, cursor), 2);
 	}
 	else
+	{
 		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, 1));
-	switch_token(token, cursor);
-	return (position+1);
+		return (switch_token(token, cursor), 1);
+	}
 }
 //
 int	is_great(t_lexem **head, t_cursor *cursor)
@@ -71,11 +69,13 @@ int	is_great(t_lexem **head, t_cursor *cursor)
 		token = D_GREAT;
 		position++;
 		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, 2));
+		return (switch_token(token, cursor), 2);
 	}
 	else
+	{
 		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, 1));
-	switch_token(token, cursor);
-	return (position+1);
+		return (switch_token(token, cursor), 2);
+	}
 }
 //
 int	get_index(int position, char *s, char c)
@@ -86,7 +86,7 @@ int	get_index(int position, char *s, char c)
 			return (position);
 		position++;
 	}
-	return (-1);
+	return (280300);
 }
 //
 int	get_space(int position, char *s)
@@ -104,18 +104,12 @@ t_token	get_token(char c)
 {
 	if (!c)
 		return (ERROR);
-	if (c == '\'')
-		return (QUOTE);
-	else if (c == '"')
-		return (DOUBLE_QUOTE);
 	else if (c == '<')
 		return (LESS);
 	else if (c == '>')
 		return (GREAT);
 	else if (c == '|')
 		return (PIPE);
-	else if (c == '$')
-		return (EXPAND);
 	else
 		return (ERROR);
 }
@@ -146,6 +140,7 @@ t_lexem	*create_node(t_lexem *head, t_token token, char *input)
 	return (head);
 }
 
+
 //
 t_lexem *parsing_input(t_cursor *cursor, char *input)
 {
@@ -153,14 +148,16 @@ t_lexem *parsing_input(t_cursor *cursor, char *input)
 
 	cursor->input = ft_strdup(input);
 	cursor->position = 0;
-	cursor->current = ERROR;
+	cursor->previous = ERROR;
 	head = NULL;
 	while (cursor->input[cursor->position])
 	{
 		while (cursor->input[cursor->position] == '\t' || cursor->input[cursor->position] == ' ')
 			cursor->position++;
-		if (cursor->input[cursor->position] == '|' || cursor->input[cursor->position] == '\'' || cursor->input[cursor->position] == '"' || cursor->input[cursor->position] == '$')
-			cursor->position += is_pipe_quotes_exp(&head, cursor);
+		if (cursor->input[cursor->position] == '|')
+			cursor->position += is_pipe_quotes(&head, cursor);
+		else if (cursor->input[cursor->position] == '\'' || cursor->input[cursor->position] == '"')
+			cursor->position += is_pipe_quotes(&head, cursor);
 		else if (cursor->input[cursor->position] == '>')
 			cursor->position += is_great(&head, cursor);
 		else if (cursor->input[cursor->position] == '<')
@@ -181,14 +178,15 @@ void free_lexem_list(t_lexem *head)
     {
         next = current->next;
         free(current->input);  
-	free(current);        
+		free(current);        
         current = next;
     }
 }
 //
-int main()
+int main(int ac, char **ag, char **env)
 {
 	char *input;
+	char *joined;
 	t_lexem *head;
 	t_lexem *current;
 	t_cursor cursor = {0};
@@ -198,8 +196,10 @@ int main()
 		return (1);
 	if (valid_input(input))
 	{
-		head = parsing_input(&cursor, input);
-	    	current = head;
+		joined = concate_hell(input, env);
+		printf("%s\n", joined);
+		head = parsing_input(&cursor, joined);
+			current = head;
 		while (current)
 		{
 			printf("Token: %u, Input: %s\n", current->token, current->input);
@@ -208,7 +208,7 @@ int main()
 		free_lexem_list(head);
 		free(cursor.input);
 	}
-	else 
+	else
 		printf("invalid input\n");
 	free(input);
 	return (0);

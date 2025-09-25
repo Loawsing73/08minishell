@@ -32,6 +32,7 @@ static int	ft_quote(char *s, int *i)
 	}
 	return (0);
 }
+
 static int	ft_dquote(char *s, int *i)
 {
 	(*i)++;
@@ -56,7 +57,7 @@ int	valid_input(char *input)
 	while (input[i])
 	{
 		if (input[i] == '\'')
-		{	
+		{
 			quote = ft_quote(input, &i);
 			i++;
 		}
