@@ -1,5 +1,68 @@
 #include "../INCLUDES/token.h"
 
+static int	pipe_end_beg(char *s)
+{
+	if (s[0] == '|')
+		return (0);
+	return (1);
+}
+static int	far_angbra(char *s)
+{
+	int	i;
+
+	i = -1;
+	while (s[++i])
+	{
+		if (s[i] == '<' && s[i+1] == ' ')
+		{
+			if (s[i+2] == '<')
+				return (0);
+			if (s[i+2] == '>')
+				return (0);
+		}
+		if (s[i] == '>' && s[i+1] == ' ')
+		{
+			if (s[i+2] == '<')
+				return (0);
+			if (s[i+2] == '>')
+				return (0);
+		}
+	}
+	return (1);
+}
+static int	triple_angbra(char *s)
+{
+	int	i;
+
+	i = -1;
+	while (s[++i])
+	{
+		if (s[i] == '<' && s[i+1] == '<')
+		{
+			if (s[i+2] == '<')
+				return (0);
+			if (s[i+2] == '>')
+				return (0);
+			if (s[i+2] == '|')
+				return (0);
+		}
+		if (s[i] == '>' && s[i+1] == '>')
+		{
+			if (s[i+2] == '<')
+				return (0);
+			if (s[i+2] == '>')
+				return (0);
+			if (s[i+2] == '|')
+				return (0);
+		}
+		if (s[i] == '>' && s[i+1] == '<')
+			return (0);
+		if (s[i] == '<' && s[i+1] == '>')
+			return (0);
+	}
+	return (1);
+}
+
 static int	special_caract(char *input)
 {
 	int	i;
@@ -65,7 +128,7 @@ int	valid_input(char *input)
 		else
 			i++;
 	}
-	return (special_caract(input) * quote * dquote);
+	return (special_caract(input) * quote * dquote * pipe_end_beg(input) * triple_angbra(input) * far_angbra(input));
 }
 
 /*

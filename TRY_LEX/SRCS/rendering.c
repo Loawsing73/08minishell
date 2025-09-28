@@ -1,10 +1,9 @@
 #include "../INCLUDES/token.h"
-
 void print_ast(t_ast_node *node, int indent)
 {
     int i;
     const char *type_names[] = {
-        "PIPELINE", "COMMAND", "ARGUMENT", "REDIRECTION", "WORD"
+        "PIPELINE", "COMMAND", "ARGUMENT", "REDIRECTION", "WORD", "HEREDOC"
     };
     
     if (!node)
@@ -13,7 +12,7 @@ void print_ast(t_ast_node *node, int indent)
     i = 0;
     while (i < indent)
     {
-        printf("  ");
+        printf(" ");
         i++;
     }
     

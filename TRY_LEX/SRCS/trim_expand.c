@@ -77,8 +77,13 @@ static int expand_variable(char *s, char *d, int *i, int *j, char **env)
 				d[*j] = var_value[k];
 				(*j)++;
 			}
-		}
 		*i = skip_variable(s, var_start);
+		}
+		else
+		{	
+			d[*j] = ' ';
+			*i = skip_variable(s, var_start);
+		}
 		return (free(var_name), 1);
 	}
 	return (0);
@@ -92,17 +97,27 @@ static void filldquote(char *s, char *d, int *i, int *j, char **env)
 		{
 			if (!expand_variable(s, d, i, j, env))
 			{
+				s[*i] = -s[*i];
 				d[*j] = s[*i];
 				(*j)++;
 			}
 		}
 		else
 		{
-			if (s[*i] == '>' || s[*i] == '<' ||s[*i] == '|')
-				s[*i] = -s[*i];
+			s[*i] = -s[*i];
 			d[*j] = s[*i];
 			(*j)++;
 		}
+	}
+	(*i)++;
+}
+static void fill_exp_dquote(char *s, char *d, int *i, int *j)
+{
+	while (++(*i) < get_index(*i, s, '"'))
+	{
+		s[*i] = -s[*i];
+		d[*j] = s[*i];
+		(*j)++;
 	}
 	(*i)++;
 }
@@ -146,6 +161,42 @@ static void fill(char *s, char *d, int *i, int *j)
 	(*i)++;
 	(*j)++;
 }
+static void	expand_heredoc(char *s, char *d, int *i, int *j)
+{
+	fill(s, d, i, j);
+	fill(s, d, i, j);
+	while (s[*i] == ' ')
+		(*i)++;
+	while((*i) != get_space(*i, s))
+	{	
+		if (s[*i] == '\'')
+			fillquote(s, d, i, j);
+		else if (s[*i] == '"')
+			fill_exp_dquote(s, d, i, j);
+		else
+			fill(s, d, i, j);
+	}
+}
+
+static int	consecutive_dollar(char *s, int i)
+{
+	while(s[++i])
+	{
+		if (s[i] == '$')
+			return (1);
+	}
+	return (0);
+}
+
+static int	consecutive_angbra(char *s, int i)
+{
+	while(s[++i])
+	{
+		if (s[i] == '>' || s[i] == '<')
+			return (1);
+	}
+	return (0);
+}
 char *concate_hell(char *s, char **env)
 {
 	int i;
@@ -159,20 +210,26 @@ char *concate_hell(char *s, char **env)
 		return (NULL);
 	while (s[i])
 	{
-		if (s[i] == '\'' || s[i] == '"')
+		if ((s[i] == '<' || s[i] == '>') && consecutive_angbra(s, i))
+			expand_heredoc(s, stash, &i, &j);
+		else if (s[i] == '\'' || s[i] == '"')
 		{
 			if (s[i] == '\'')
 				fillquote(s, stash, &i, &j);
 			else if (s[i] == '"')
 				filldquote(s, stash, &i, &j, env);
 		}
-		else if (s[i] == '$' && s[i+1] != '$')
+		else if (s[i] == '$' && !consecutive_dollar(s, i))
 		{
 			if (!expand_variable(s, stash, &i, &j, env))
 				fill(s, stash, &i, &j);
 		}
 		else
+		{
+			if (s[i] == '$' && consecutive_dollar(s, i))
+				fill(s, stash, &i, &j);
 			fill(s, stash, &i, &j);
+		}
 	}
 	stash[j] = '\0';
 	return (stash);

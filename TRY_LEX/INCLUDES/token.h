@@ -10,12 +10,13 @@
 typedef	enum e_token
 {
 	WORD = 0,
-	IO_LOCA,
-	D_LESS,
+	IO_LOCA, //1
+	DELIMITER,
+	D_LESS, //3
 	D_GREAT,
-	LESS,
+	LESS, //5
 	GREAT,
-	PIPE,
+	PIPE, //7
 	ERROR
 }	t_token;
 
@@ -40,7 +41,8 @@ typedef enum e_node_type
     NODE_COMMAND,
     NODE_ARGUMENT,
     NODE_REDIRECTION,
-    NODE_WORD
+    NODE_WORD,
+    NODE_HEREDOC        // Nouveau type pour 
 } t_node_type;
 
 // Structure pour les nœuds de l'AST
@@ -51,6 +53,7 @@ typedef struct s_ast_node
     struct s_ast_node **children;   // Tableau dynamique d'enfants
     int child_count;
     int child_capacity;
+	size_t children_byte_size;
 } t_ast_node;
 
 // Structure pour le parser
@@ -68,7 +71,7 @@ int	ft_isalnum(int c);
 char	*ft_strchr(char *s, int c);
 char	*ft_strtrim(char *s1, char *set);
 void	*ft_memcpy(void *restrict dst, const void *restrict src, size_t n);
-void *my_realloc(void *ptr, size_t new_size);
+void *my_realloc(void *ptr, size_t old_size, size_t new_size);
 
 int	is_pipe(t_lexem **head, t_cursor *cursor);
 int	is_word(t_lexem **head, t_cursor *cursor);

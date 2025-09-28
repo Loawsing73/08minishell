@@ -24,10 +24,15 @@ int is_word(t_lexem **head, t_cursor *cu)
  	pipe = get_index(cu->position, cu->input, '|');
  	less = get_index(cu->position, cu->input, '<');
  	great = get_index(cu->position, cu->input, '>');
-	if (cu->current == LESS || cu->current == GREAT || cu->current == D_LESS || cu->current == D_GREAT)
+	if (cu->current == GREAT || cu->current == D_GREAT || cu->current == LESS)
  	{
  		token = IO_LOCA;
  		index = (get_space(cu->position, cu->input)-cu->position);
+	}
+	if (cu->current == D_LESS)
+	{
+		token = DELIMITER;
+		index = (get_space(cu->position, cu->input)-cu->position);
 	}
 	else if (cu->current == ERROR)
  		index = get_space(cu->position, cu->input)-cu->position;
@@ -83,9 +88,10 @@ int	is_great(t_lexem **head, t_cursor *cursor)
 	else
 	{
 		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, 1));
-		return (switch_token(token, cursor), 2);
+		return (switch_token(token, cursor), 1);
 	}
 }
+
 //
 int	get_index(int position, char *s, char c)
 {
