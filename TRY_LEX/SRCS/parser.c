@@ -22,12 +22,13 @@ t_ast_node *create_node_ast(t_node_type type, char *value)
 // ajouter node - exponentiel
 void add_child(t_ast_node *parent, t_ast_node *child)
 {
-    if (!parent || !child)
+    size_t old_size;
+
+	if (!parent || !child)
         return ;
     if (parent->child_count >= parent->child_capacity)
     {
-        size_t old_size = parent->children_byte_size;
-        
+        old_size = parent->children_byte_size;
         if (parent->child_capacity == 0)
             parent->child_capacity = 4;
         else
@@ -77,7 +78,7 @@ int is_argument_token(t_token token)
 	return (0);
 }
 // consommer token
-void advance_token(t_parser *parser)
+void consum_token(t_parser *parser)
 {
 	if (parser->current)
 		parser->current = parser->current->next;
@@ -109,38 +110,62 @@ t_ast_node *parse_pipeline(t_parser *parser)
 	add_child(pipeline, command);
 	if (match_token(parser, PIPE))
 	{
-		advance_token(parser);
+		consum_token(parser);
 		t_ast_node *next_pipeline = parse_pipeline(parser);
 		if (next_pipeline)
 			add_child(pipeline, next_pipeline);
 	}
 	return (pipeline);
 }
-
+static t_ast_node *parse_heredoc(t_parser *parser)
+{
+    t_ast_node *heredoc;
+    
+    if (!match_token(parser, D_LESS))
+        return (NULL);
+	consum_token(parser);
+    if (!parser->current || (parser->current->token != DELIMITER && parser->current->token != WORD))
+        return (NULL);
+    heredoc = create_node_ast(NODE_HEREDOC, parser->current->input);
+	consum_token(parser);
+    return (heredoc);
+}
 // command -> word argument_list redirection_list
 // Mais il faut permettre l'alternance entre arguments et redirections
 t_ast_node *parse_command(t_parser *parser)
 {
     t_ast_node *command;
-    t_ast_node *word;
+    t_ast_node *word = NULL;
     t_ast_node *args;
     t_ast_node *redirections;
 
-    if (!match_token(parser, WORD))
+    if (!match_token(parser, WORD) && !is_redirection_token(parser->current->token))
         return (NULL);
     command = create_node_ast(NODE_COMMAND, NULL);
-    word = parse_word(parser);
-    if (word)
-        add_child(command, word);
     args = create_node_ast(NODE_ARGUMENT, NULL);
     redirections = create_node_ast(NODE_REDIRECTION, NULL);
     while (parser->current)
     {
-        if (is_argument_token(parser->current->token))
+        if (match_token(parser, WORD))
         {
-            t_ast_node *arg = parse_argument(parser);
-            if (arg)
-                add_child(args, arg);
+            if (word == NULL)
+            {
+                word = parse_word(parser);
+                if (word)
+                    add_child(command, word);
+            }
+            else
+            {
+                t_ast_node *arg = parse_word(parser);
+                if (arg)
+                    add_child(args, arg);
+            }
+        }
+        else if (parser->current->token == D_LESS)
+        {
+            t_ast_node *heredoc = parse_heredoc(parser);
+            if (heredoc)
+                add_child(redirections, heredoc);
             else
                 break ;
         }
@@ -216,24 +241,12 @@ t_ast_node *parse_redirection_list(t_parser *parser)
 		if (redir)
 			add_child(redir_list, redir);
 		else
-			break;
+			break ;
 	}
 	return (redir_list);
 }
 
-static t_ast_node *parse_heredoc(t_parser *parser)
-{
-    t_ast_node *heredoc;
-    
-    if (!match_token(parser, D_LESS))
-        return (NULL);
-    advance_token(parser);
-    if (!parser->current || (parser->current->token != DELIMITER && parser->current->token != WORD))
-        return (NULL);
-    heredoc = create_node_ast(NODE_HEREDOC, parser->current->input);
-    advance_token(parser);
-    return (heredoc);
-}
+
 // redirection -> '<' word | '>' word | '<<' word | '>>' word
 t_ast_node *parse_redirection(t_parser *parser)
 {
@@ -256,7 +269,7 @@ t_ast_node *parse_redirection(t_parser *parser)
     redirection = create_node_ast(NODE_REDIRECTION, redir_type);
     if (!redirection)
         return (NULL);
-    advance_token(parser);
+ 	consum_token(parser);
     if (match_token(parser, IO_LOCA))
     {
         target = create_node_ast(NODE_WORD, parser->current->input);
@@ -265,7 +278,7 @@ t_ast_node *parse_redirection(t_parser *parser)
             free_ast(redirection);
             return (NULL);
         }
-    	advance_token(parser);
+    	consum_token(parser);
         add_child(redirection, target);
     }
     return (redirection);
@@ -280,7 +293,7 @@ t_ast_node *parse_word(t_parser *parser)
 	if (!match_token(parser, WORD))
 		return (NULL);
 	word = create_node_ast(NODE_WORD, parser->current->input);
-	advance_token(parser);
+	consum_token(parser);
 	return (word);
 }
 

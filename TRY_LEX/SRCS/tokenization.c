@@ -11,7 +11,7 @@ int	is_pipe(t_lexem **head, t_cursor *cursor)
 	switch_token(token, cursor);
 	return (1);
 }
-//
+
 int is_word(t_lexem **head, t_cursor *cu)
 {
  	t_token token;
@@ -49,7 +49,7 @@ int is_word(t_lexem **head, t_cursor *cu)
 	*head = create_node(*head, token, ft_substr(cu->input, cu->position, index));
 	return (switch_token(token, cu), index);
 }
-//
+
 int	is_less(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
@@ -70,7 +70,7 @@ int	is_less(t_lexem **head, t_cursor *cursor)
 		return (switch_token(token, cursor), 1);
 	}
 }
-//
+
 int	is_great(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
@@ -92,7 +92,6 @@ int	is_great(t_lexem **head, t_cursor *cursor)
 	}
 }
 
-//
 int	get_index(int position, char *s, char c)
 {
 	while (s[position])
@@ -103,7 +102,7 @@ int	get_index(int position, char *s, char c)
 	}
 	return (280300);
 }
-//
+
 int	get_space(int position, char *s)
 {
 	while (s[position])
@@ -114,7 +113,7 @@ int	get_space(int position, char *s)
 	}
 	return (ft_strlen(s));
 }
-//
+
 t_token	get_token(char c)
 {
 	if (!c)
@@ -128,13 +127,13 @@ t_token	get_token(char c)
 	else
 		return (ERROR);
 }
-//
+
 void	switch_token(t_token token, t_cursor *cursor)
 {
 	cursor->previous = cursor->current;
 	cursor->current = token;
 }
-//
+
 t_lexem	*create_node(t_lexem *head, t_token token, char *input)
 {
 	t_lexem	*node;
@@ -155,8 +154,6 @@ t_lexem	*create_node(t_lexem *head, t_token token, char *input)
 	return (head);
 }
 
-
-//
 t_lexem *parsing_input(t_cursor *cursor, char *input)
 {
 	t_lexem	*head;
@@ -181,7 +178,7 @@ t_lexem *parsing_input(t_cursor *cursor, char *input)
 	}	
 	return (head);
 }	
-//
+
 void free_lexem_list(t_lexem *head)
 {
     t_lexem *current;
@@ -196,7 +193,7 @@ void free_lexem_list(t_lexem *head)
         current = next;
     }
 }
-//
+
 int main(int ac, char **ag, char **env)
 {
 	char *input;
@@ -211,12 +208,18 @@ int main(int ac, char **ag, char **env)
 	{
 		input = readline("enter : ");
 		if (!input)
+		{
+			clear_history();
 			return (1);
+		}
 		if (ft_strncmp(input, "exit", 4) == 0)
 		{
-    		free(input);
+    		add_history(input);
+			free(input);
 			break;
 		}
+		if (*input)
+			add_history(input);
 		if (valid_input(ft_strtrim(input, " ")))
 		{
 			joined = concate_hell(input, env);
@@ -250,5 +253,6 @@ int main(int ac, char **ag, char **env)
 			cursor.input = NULL;
 		}
 	}
+	clear_history();
 	return (0);
 }

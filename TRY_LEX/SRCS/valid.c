@@ -130,17 +130,3 @@ int	valid_input(char *input)
 	}
 	return (special_caract(input) * quote * dquote * pipe_end_beg(input) * triple_angbra(input) * far_angbra(input));
 }
-
-/*
-int main()
-{
-    char *input;
-    input = readline("enter : ");
-    if (!input)
-        return (1);
-    printf("%d\n", valid_input(input));
-    free(input);
-    
-    return (0);
-}
-*/
