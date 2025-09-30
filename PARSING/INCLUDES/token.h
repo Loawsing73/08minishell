@@ -20,6 +20,14 @@ typedef enum e_token
 	ERROR
 }	t_token;
 
+typedef struct s_index
+{
+	int	pipe;
+	int	less;
+	int	great;
+	int	space;
+}	t_index;
+
 //NODE LINKLIST	
 typedef struct s_lexem
 {

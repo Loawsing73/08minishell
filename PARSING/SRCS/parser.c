@@ -141,18 +141,21 @@ static t_ast_node	*parse_heredoc(t_parser *parser)
 	return (heredoc);
 }
 // command -> word argument_list redirection_list
-// Mais il faut permettre l'alternance entre arguments et redirections
 t_ast_node *parse_command(t_parser *parser)
 {
     t_ast_node *command;
-    t_ast_node *word = NULL;
+    t_ast_node *word;
     t_ast_node *args;
     t_ast_node *redirections;
+	t_ast_node *arg;
+	t_ast_node *heredoc;
+	t_ast_node *redir;
 
     if (!match_token(parser, WORD) && !is_redirection_token(parser->current->token))
         return (NULL);
     command = create_node_ast(NODE_COMMAND, NULL);
     args = create_node_ast(NODE_ARGUMENT, NULL);
+	word = NULL;
     redirections = create_node_ast(NODE_REDIRECTION, NULL);
     while (parser->current)
     {
@@ -166,14 +169,14 @@ t_ast_node *parse_command(t_parser *parser)
             }
             else
             {
-                t_ast_node *arg = parse_word(parser);
+                arg = parse_word(parser);
                 if (arg)
                     add_child(args, arg);
             }
         }
         else if (parser->current->token == D_LESS)
         {
-            t_ast_node *heredoc = parse_heredoc(parser);
+            heredoc = parse_heredoc(parser);
             if (heredoc)
                 add_child(redirections, heredoc);
             else
@@ -181,7 +184,7 @@ t_ast_node *parse_command(t_parser *parser)
         }
         else if (is_redirection_token(parser->current->token))
         {
-            t_ast_node *redir = parse_redirection(parser);
+        	redir = parse_redirection(parser);
             if (redir)
                 add_child(redirections, redir);
             else

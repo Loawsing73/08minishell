@@ -93,22 +93,26 @@ static int	expand_variable(char *s, char *d, int *i, int *j, char **env)
 
 static void	filldquote(char *s, char *d, int *i, int *j, char **env)
 {
-	while (++(*i) < get_index(*i, s, '"'))
+	int	limit;
+
+	(*i)++;
+	limit = get_index(*i, s, '"');
+	while ((*i) < limit)
 	{
 		if (s[*i] == '$' && s[(*i) + 1] != '$')
 		{
 			if (!expand_variable(s, d, i, j, env))
 			{
-				s[*i] = -s[*i];
-				d[*j] = s[*i];
+				d[*j] = -s[*i];
 				(*j)++;
+				(*i)++;
 			}
 		}
 		else
 		{
-			s[*i] = -s[*i];
-			d[*j] = s[*i];
+			d[*j] = -s[*i];
 			(*j)++;
+			(*i)++;
 		}
 	}
 	(*i)++;
@@ -116,11 +120,15 @@ static void	filldquote(char *s, char *d, int *i, int *j, char **env)
 
 static void	fill_exp_dquote(char *s, char *d, int *i, int *j)
 {
-	while (++(*i) < get_index(*i, s, '"'))
+	int	limit;
+
+	(*i)++;
+	limit = get_index(*i, s, '"');
+	while ((*i) < limit)
 	{
-		s[*i] = -s[*i];
-		d[*j] = s[*i];
+		d[*j] = -s[*i];
 		(*j)++;
+		(*i)++;
 	}
 	(*i)++;
 }
@@ -131,8 +139,9 @@ static void fillquote(char *s, char *d, int *i, int *j)
 	while (s[*i] != '\'' && s[*i])
 	{
 		if (s[*i] == '>' || s[*i] == '<' || s[*i] == '|')
-			s[*i] = -s[*i];
-		d[*j] = s[*i];
+			d[*i] = -s[*i];
+		else
+			d[*j] = s[*i];
 		(*i)++;
 		(*j)++;
 	}
@@ -191,11 +200,9 @@ static int	consecutive_dollar(char *s, int i)
 
 static int	consecutive_angbra(char *s, int i)
 {
-	while (s[++i])
-	{
-		if (s[i] == '>' || s[i] == '<')
-			return (1);
-	}
+	i++;
+	if (s[i] == '>' || s[i] == '<')
+		return (1);
 	return (0);
 }
 

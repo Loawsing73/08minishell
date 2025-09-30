@@ -16,37 +16,34 @@ int	is_pipe(t_lexem **head, t_cursor *cursor)
 int	is_word(t_lexem **head, t_cursor *cu)
 {
 	t_token	token;
+	t_index	data;
 	int		index;
-	int		pipe;
-	int		less;
-	int		great;
 
 	token = WORD;
-	pipe = get_index(cu->position, cu->input, '|');
-	less = get_index(cu->position, cu->input, '<');
-	great = get_index(cu->position, cu->input, '>');
+	data.pipe = get_index(cu->position, cu->input, '|') - cu->position;
+	data.less = get_index(cu->position, cu->input, '<') - cu->position;
+	data.great = get_index(cu->position, cu->input, '>') - cu->position;
+	data.space = get_space(cu->position, cu->input) - cu->position;
 	if (cu->current == GREAT || cu->current == D_GREAT || cu->current == LESS)
 	{
 		token = IO_LOCA;
-		index = (get_space(cu->position, cu->input) - cu->position);
+	 	index = data.space;
 	}
-	if (cu->current == D_LESS)
+	else if (cu->current == D_LESS)
 	{
 		token = DELIMITER;
-		index = (get_space(cu->position, cu->input) - cu->position);
+	 	index = data.space;
 	}
 	else if (cu->current == ERROR)
-		index = get_space(cu->position, cu->input) - cu->position;
-	else if (pipe < less && pipe < great && pipe > -1 && cu->current != PIPE)
-		index = get_index(cu->position, cu->input, '|') - cu->position;
-	else if (less < pipe && less < great && less > -1)
-		index = get_index(cu->position, cu->input, '<') - cu->position;
-	else if (great < pipe && great < less && great > -1)
-		index = get_index(cu->position, cu->input, '>') - cu->position;
-	else if (cu->current == WORD && cu->position != 0)
-		index = ft_strlen(cu->input) - cu->position;
+		index = data.space;
+	else if  (data.pipe < data.less && data.pipe < data.great && data.pipe > -1 && cu->current != PIPE)
+		index = data.pipe;
+	else if  (data.less < data.pipe && data.less < data.great && data.less > -1)
+		index = data.less;
+	else if  (data.great < data.pipe && data.great < data.less && data.great > -1)
+		index = data.great;
 	else
-		index = get_space(cu->position, cu->input) - cu->position;
+		index = data.space;
 	*head = create_node(*head, token,
 			ft_substr(cu->input, cu->position, index));
 	return (switch_token(token, cu), index);
@@ -106,7 +103,7 @@ int	get_index(int position, char *s, char c)
 			return (position);
 		position++;
 	}
-	return (280300);
+	return (-280300);
 }
 
 int	get_space(int position, char *s)
@@ -200,6 +197,18 @@ void	free_lexem_list(t_lexem *head)
 		current = next;
 	}
 }
+static void	clean_neg_ascii(char *s)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+	{
+		if (s[i] < 0)
+			s[i] = -s[i];
+		i++;
+	}
+}
 
 int main(int ac, char **ag, char **env)
 {
@@ -230,6 +239,7 @@ int main(int ac, char **ag, char **env)
 		if (valid_input(ft_strtrim(input, " ")))
 		{
 			joined = concate_hell(input, env);
+			clean_neg_ascii(joined);
 			printf("%s\n", joined);
 			head = parsing_input(&cursor, joined);
 			current = head;
