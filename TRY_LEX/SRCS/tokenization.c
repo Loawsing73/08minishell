@@ -7,66 +7,70 @@ int	is_pipe(t_lexem **head, t_cursor *cursor)
 	token = get_token(cursor->input[cursor->position]);
 	if (token != PIPE)
 		token = WORD;
-	*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, 1));
+	*head = create_node(*head, token,
+			ft_substr(cursor->input, cursor->position, 1));
 	switch_token(token, cursor);
 	return (1);
 }
 
-int is_word(t_lexem **head, t_cursor *cu)
+int	is_word(t_lexem **head, t_cursor *cu)
 {
- 	t_token token;
-	int index;
-	int pipe;
-	int less;
-	int great;
- 
+	t_token	token;
+	int		index;
+	int		pipe;
+	int		less;
+	int		great;
+
 	token = WORD;
- 	pipe = get_index(cu->position, cu->input, '|');
- 	less = get_index(cu->position, cu->input, '<');
- 	great = get_index(cu->position, cu->input, '>');
+	pipe = get_index(cu->position, cu->input, '|');
+	less = get_index(cu->position, cu->input, '<');
+	great = get_index(cu->position, cu->input, '>');
 	if (cu->current == GREAT || cu->current == D_GREAT || cu->current == LESS)
- 	{
- 		token = IO_LOCA;
- 		index = (get_space(cu->position, cu->input)-cu->position);
+	{
+		token = IO_LOCA;
+		index = (get_space(cu->position, cu->input) - cu->position);
 	}
 	if (cu->current == D_LESS)
 	{
 		token = DELIMITER;
-		index = (get_space(cu->position, cu->input)-cu->position);
+		index = (get_space(cu->position, cu->input) - cu->position);
 	}
 	else if (cu->current == ERROR)
- 		index = get_space(cu->position, cu->input)-cu->position;
-	else if (pipe < less && pipe < great && pipe > -1 && cu->current !=PIPE)
- 		index = get_index(cu->position, cu->input, '|')-cu->position;
+		index = get_space(cu->position, cu->input) - cu->position;
+	else if (pipe < less && pipe < great && pipe > -1 && cu->current != PIPE)
+		index = get_index(cu->position, cu->input, '|') - cu->position;
 	else if (less < pipe && less < great && less > -1)
- 		index = get_index(cu->position, cu->input, '<')-cu->position;
+		index = get_index(cu->position, cu->input, '<') - cu->position;
 	else if (great < pipe && great < less && great > -1)
- 		index = get_index(cu->position, cu->input, '>')-cu->position;
+		index = get_index(cu->position, cu->input, '>') - cu->position;
 	else if (cu->current == WORD && cu->position != 0)
- 		index = ft_strlen(cu->input)-cu->position;
+		index = ft_strlen(cu->input) - cu->position;
 	else
- 		index = get_space(cu->position, cu->input)-cu->position;
-	*head = create_node(*head, token, ft_substr(cu->input, cu->position, index));
+		index = get_space(cu->position, cu->input) - cu->position;
+	*head = create_node(*head, token,
+			ft_substr(cu->input, cu->position, index));
 	return (switch_token(token, cu), index);
 }
 
 int	is_less(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
-	int 	position;
-	
+	int		position;
+
 	position = cursor->position;
 	token = get_token(cursor->input[position]);
 	if (get_token(cursor->input[position +1]) == token)
-	{		
+	{
 		token = D_LESS;
 		position++;
-		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, 2));
+		*head = create_node(*head, token,
+				ft_substr(cursor->input, cursor->position, 2));
 		return (switch_token(token, cursor), 2);
 	}
 	else
 	{
-		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, 1));
+		*head = create_node(*head, token,
+				ft_substr(cursor->input, cursor->position, 1));
 		return (switch_token(token, cursor), 1);
 	}
 }
@@ -74,20 +78,22 @@ int	is_less(t_lexem **head, t_cursor *cursor)
 int	is_great(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
-	int 	position;
-	
+	int		position;
+
 	position = cursor->position;
 	token = get_token(cursor->input[position]);
-	if (get_token(cursor->input[position+1]) == token)
-	{		
+	if (get_token(cursor->input[position + 1]) == token)
+	{
 		token = D_GREAT;
 		position++;
-		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, 2));
+		*head = create_node(*head, token,
+				ft_substr(cursor->input, cursor->position, 2));
 		return (switch_token(token, cursor), 2);
 	}
 	else
 	{
-		*head = create_node(*head, token, ft_substr(cursor->input, cursor->position, 1));
+		*head = create_node(*head, token,
+				ft_substr(cursor->input, cursor->position, 1));
 		return (switch_token(token, cursor), 1);
 	}
 }
@@ -165,7 +171,8 @@ t_lexem *parsing_input(t_cursor *cursor, char *input)
 	head = NULL;
 	while (cursor->input[cursor->position])
 	{
-		while (cursor->input[cursor->position] == '\t' || cursor->input[cursor->position] == ' ')
+		while (cursor->input[cursor->position] == '\t'
+			|| cursor->input[cursor->position] == ' ')
 			cursor->position++;
 		if (cursor->input[cursor->position] == '|')
 			cursor->position += is_pipe(&head, cursor);
@@ -175,23 +182,23 @@ t_lexem *parsing_input(t_cursor *cursor, char *input)
 			cursor->position += is_less(&head, cursor);
 		else
 			cursor->position += is_word(&head, cursor);
-	}	
+	}
 	return (head);
-}	
+}
 
-void free_lexem_list(t_lexem *head)
+void	free_lexem_list(t_lexem *head)
 {
-    t_lexem *current;
-    t_lexem *next;
+	t_lexem	*current;
+	t_lexem	*next;
 
-    current = head;
-    while (current)
-    {
-        next = current->next;
-        free(current->input);  
-		free(current);        
-        current = next;
-    }
+	current = head;
+	while (current)
+	{
+		next = current->next;
+		free(current->input);
+		free(current);
+		current = next;
+	}
 }
 
 int main(int ac, char **ag, char **env)

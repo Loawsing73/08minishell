@@ -6,6 +6,7 @@ static int	pipe_end_beg(char *s)
 		return (0);
 	return (1);
 }
+
 static int	far_angbra(char *s)
 {
 	int	i;
@@ -13,23 +14,24 @@ static int	far_angbra(char *s)
 	i = -1;
 	while (s[++i])
 	{
-		if (s[i] == '<' && s[i+1] == ' ')
+		if (s[i] == '<' && s[i + 1] == ' ')
 		{
-			if (s[i+2] == '<')
+			if (s[i + 2] == '<')
 				return (0);
-			if (s[i+2] == '>')
+			if (s[i + 2] == '>')
 				return (0);
 		}
-		if (s[i] == '>' && s[i+1] == ' ')
+		if (s[i] == '>' && s[i + 1] == ' ')
 		{
-			if (s[i+2] == '<')
+			if (s[i + 2] == '<')
 				return (0);
-			if (s[i+2] == '>')
+			if (s[i + 2] == '>')
 				return (0);
 		}
 	}
 	return (1);
 }
+
 static int	triple_angbra(char *s)
 {
 	int	i;
@@ -37,27 +39,19 @@ static int	triple_angbra(char *s)
 	i = -1;
 	while (s[++i])
 	{
-		if (s[i] == '<' && s[i+1] == '<')
+		if ((s[i] == '<' && s[i + 1] == '<')
+			|| (s[i] == '>' && s[i + 1] == '>'))
 		{
-			if (s[i+2] == '<')
+			if (s[i + 2] == '<')
 				return (0);
-			if (s[i+2] == '>')
+			if (s[i + 2] == '>')
 				return (0);
-			if (s[i+2] == '|')
+			if (s[i + 2] == '|')
 				return (0);
 		}
-		if (s[i] == '>' && s[i+1] == '>')
-		{
-			if (s[i+2] == '<')
-				return (0);
-			if (s[i+2] == '>')
-				return (0);
-			if (s[i+2] == '|')
-				return (0);
-		}
-		if (s[i] == '>' && s[i+1] == '<')
+		if (s[i] == '>' && s[i + 1] == '<')
 			return (0);
-		if (s[i] == '<' && s[i+1] == '>')
+		if (s[i] == '<' && s[i + 1] == '>')
 			return (0);
 	}
 	return (1);
@@ -70,10 +64,10 @@ static int	special_caract(char *input)
 	i = 0;
 	while (input[i])
 	{
-		if (input[i] == '\\' || input[i] == ';' || input[i] == '*' ||
-			input[i] == '[' || input[i] == ']' || input[i] == '(' ||
-			input[i] == '#' || input[i] == '=' ||
-			input[i] == '%' || input[i] == '!')
+		if (input[i] == '\\' || input[i] == ';' || input[i] == '*'
+			|| input[i] == '[' || input[i] == ']' || input[i] == '('
+			|| input[i] == '#' || input[i] == '='
+			|| input[i] == '%' || input[i] == '!')
 			return (0);
 		i++;
 	}
@@ -128,5 +122,6 @@ int	valid_input(char *input)
 		else
 			i++;
 	}
-	return (special_caract(input) * quote * dquote * pipe_end_beg(input) * triple_angbra(input) * far_angbra(input));
+	return (special_caract(input) * quote * dquote * pipe_end_beg(input)
+		* triple_angbra(input) * far_angbra(input));
 }

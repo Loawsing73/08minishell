@@ -3,19 +3,19 @@
 //gardera index a jour 
 #include "../INCLUDES/token.h"
 
-static int skip_variable(char *s, int i)
+static int	skip_variable(char *s, int i)
 {
 	while (s[i] && (ft_isalnum(s[i]) || s[i] == '_'))
 		i++;
-	return i;
+	return (i);
 }
 
-static char *extract_variable_input(char *s, int start_pos)
+static char	*extract_variable_input(char *s, int start_pos)
 {
-	int i;
-	int len;
-	char *var_name;
-	
+	int		i;
+	int		len;
+	char	*var_name;
+
 	i = start_pos;
 	len = 0;
 	while (s[i] && (ft_isalnum(s[i]) || s[i] == '_'))
@@ -38,32 +38,33 @@ static char *extract_variable_input(char *s, int start_pos)
 	return (var_name);
 }
 
-static char *find_within_env(char **env, char *var_name)
+static char	*find_within_env(char **env, char *var_name)
 {
-	int i;
-	int var_len;
-	
+	int	i;
+	int	var_len;
+
 	if (!env || !var_name)
 		return (NULL);
 	i = 0;
 	var_len = ft_strlen(var_name);
 	while (env[i])
 	{
-		if (ft_strncmp(var_name, env[i], var_len) == 0 && env[i][var_len] == '=')
+		if (ft_strncmp(var_name, env[i], var_len) == 0
+			&& env[i][var_len] == '=')
 			return (&env[i][var_len + 1]);
 		i++;
 	}
 	return (NULL);
 }
 
-static int expand_variable(char *s, char *d, int *i, int *j, char **env)
+static int	expand_variable(char *s, char *d, int *i, int *j, char **env)
 {
-	char *var_name;
-	char *var_value;
-	int k;
-	int var_start;
-	
-	if (s[*i] != '$' || s[(*i)+1] == '$')
+	char	*var_name;
+	char	*var_value;
+	int		k;
+	int		var_start;
+
+	if (s[*i] != '$' || s[(*i) + 1] == '$')
 		return (0);
 	var_start = *i + 1;
 	var_name = extract_variable_input(s, var_start);
@@ -81,7 +82,7 @@ static int expand_variable(char *s, char *d, int *i, int *j, char **env)
 			*i = skip_variable(s, var_start);
 		}
 		else
-		{	
+		{
 			d[*j] = ' ';
 			*i = skip_variable(s, var_start);
 		}
@@ -90,11 +91,11 @@ static int expand_variable(char *s, char *d, int *i, int *j, char **env)
 	return (0);
 }
 
-static void filldquote(char *s, char *d, int *i, int *j, char **env)
+static void	filldquote(char *s, char *d, int *i, int *j, char **env)
 {
 	while (++(*i) < get_index(*i, s, '"'))
 	{
-		if (s[*i] == '$' && s[(*i)+1] != '$')
+		if (s[*i] == '$' && s[(*i) + 1] != '$')
 		{
 			if (!expand_variable(s, d, i, j, env))
 			{
@@ -113,7 +114,7 @@ static void filldquote(char *s, char *d, int *i, int *j, char **env)
 	(*i)++;
 }
 
-static void fill_exp_dquote(char *s, char *d, int *i, int *j)
+static void	fill_exp_dquote(char *s, char *d, int *i, int *j)
 {
 	while (++(*i) < get_index(*i, s, '"'))
 	{
@@ -138,10 +139,10 @@ static void fillquote(char *s, char *d, int *i, int *j)
 	(*i)++;
 }
 
-static int max_env(char **env, char *s)
+static int	max_env(char **env, char *s)
 {
-	int i;
-	int max;
+	int	i;
+	int	max;
 
 	i = 0;
 	max = 0;
@@ -153,10 +154,10 @@ static int max_env(char **env, char *s)
 			max = ft_strlen(env[i]);
 		i++;
 	}
-	return (max+100);
+	return (max + 100);
 }
 
-static void fill(char *s, char *d, int *i, int *j)
+static void	fill(char *s, char *d, int *i, int *j)
 {
 	d[*j] = s[*i];
 	(*i)++;
@@ -169,8 +170,8 @@ static void	expand_heredoc(char *s, char *d, int *i, int *j)
 	fill(s, d, i, j);
 	while (s[*i] == ' ')
 		(*i)++;
-	while((*i) != get_space(*i, s))
-	{	
+	while ((*i) != get_space(*i, s))
+	{
 		if (s[*i] == '\'')
 			fillquote(s, d, i, j);
 		else if (s[*i] == '"')
@@ -190,7 +191,7 @@ static int	consecutive_dollar(char *s, int i)
 
 static int	consecutive_angbra(char *s, int i)
 {
-	while(s[++i])
+	while (s[++i])
 	{
 		if (s[i] == '>' || s[i] == '<')
 			return (1);
@@ -198,7 +199,7 @@ static int	consecutive_angbra(char *s, int i)
 	return (0);
 }
 
-char *concate_hell(char *s, char **env)
+char	*concate_hell(char *s, char **env)
 {
 	int i;
 	int j;

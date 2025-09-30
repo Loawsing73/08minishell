@@ -1,13 +1,13 @@
 #ifndef TOKEN_H
-#define TOKEN_H
+# define TOKEN_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <readline/readline.h>
+# include <readline/history.h>
 
-typedef	enum e_token
+typedef enum e_token
 {
 	WORD = 0,
 	IO_LOCA, //1
@@ -21,14 +21,14 @@ typedef	enum e_token
 }	t_token;
 
 //NODE LINKLIST	
-typedef struct	s_lexem
+typedef struct s_lexem
 {
 	t_token	token;
 	char	*input;
-	struct s_lexem	*next;
+	struct 	s_lexem	*next;
 }	t_lexem;
 //CURSOR TOKEN
-typedef	struct	s_cursor
+typedef struct s_cursor
 {
 	int	position;
 	char	*input;
@@ -38,12 +38,12 @@ typedef	struct	s_cursor
 
 typedef enum e_node_type
 {
-    NODE_PIPELINE,
-    NODE_COMMAND,
-    NODE_ARGUMENT,
-    NODE_REDIRECTION,
-    NODE_WORD,
-    NODE_HEREDOC
+	NODE_PIPELINE,
+	NODE_COMMAND,
+	NODE_ARGUMENT,
+	NODE_REDIRECTION,
+	NODE_WORD,
+	NODE_HEREDOC
 }	t_node_type;
 
 // NODE AST
