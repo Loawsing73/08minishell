@@ -1,7 +1,7 @@
 MAKEFLAGS += --no-print-directory
 NAME = parser
 CC = cc
-CFLAGS = -Werror -Wextra -Wall
+CFLAGS = -Werror -Wextra -Wall -g
 LDFLAGS = -lreadline
 INCLUDES = -I INCLUDES
 SRCS = SRCS/parser.c \

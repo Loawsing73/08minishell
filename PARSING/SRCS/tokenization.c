@@ -197,18 +197,18 @@ void	free_lexem_list(t_lexem *head)
 		current = next;
 	}
 }
-static void	clean_neg_ascii(char *s)
-{
-	int	i;
+// static void	clean_neg_ascii(char *s)
+// {
+// 	int	i;
 
-	i = 0;
-	while (s[i])
-	{
-		if (s[i] < 0)
-			s[i] = -s[i];
-		i++;
-	}
-}
+// 	i = 0;
+// 	while (s[i])
+// 	{
+// 		if (s[i] < 0)
+// 			s[i] = -s[i];
+// 		i++;
+// 	}
+// }
 
 int main(int ac, char **ag, char **env)
 {
@@ -239,7 +239,7 @@ int main(int ac, char **ag, char **env)
 		if (valid_input(ft_strtrim(input, " ")))
 		{
 			joined = concate_hell(input, env);
-			clean_neg_ascii(joined);
+			// clean_neg_ascii(joined);
 			printf("%s\n", joined);
 			head = parsing_input(&cursor, joined);
 			current = head;

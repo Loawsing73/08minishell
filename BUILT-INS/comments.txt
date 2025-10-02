@@ -15,3 +15,8 @@ cd (change directory) :
 pwd (print working directory) :
     dir supprime apres acces
         affiche chemin
+
+
+
+
+cd echo signaux
