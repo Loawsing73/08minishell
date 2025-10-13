@@ -8,6 +8,8 @@ cd (change directory) :
         repertoir courant change pas
         si deja dedans, reste "dans" mais peut
             plus acceder normalement
+        permission
+            "Permission denied"
     cd sans arg => home
     cd - => retourne rep precedent
     cd .. => remonte un lvl

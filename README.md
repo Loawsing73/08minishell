@@ -20,13 +20,3 @@ quoted_string -> QUOTE content QUOTE
 quoted_string -> DOUBLE_QUOTE content DOUBLE_QUOTE
 
 word         -> WORD
-
-test Nico: 
-<!-- expand $ -> rien 
-si $US (ou US existe pas) -> rien 
->>> -> >> puis pas > comme token redirect -->
--   << delimiter => Alexis ? dquote ? env ? -> exec p-e probleme 
-<!-- -   expand $ plusieurs fois -->
--   ls > test >> test > test $USER | ls '|' -a $USER $USER(prblm)
-
-ATTENTION : rl_clear_history different MAC et linux

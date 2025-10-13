@@ -4,6 +4,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <fcntl.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 
@@ -77,11 +78,15 @@ char		*ft_substr(char *s, int start, int len);
 char		*ft_strdup(char *s1);
 char		*ft_strchr(char *s, int c);
 char		*ft_strtrim(char *s1, char *set);
+char		*ft_strjoin(char *s1, char *s2);
+char		*ft_strrchr(const char *s, int c);
+char		**ft_split(char const *s, char c);
 int			ft_strlen(char *s);
 int			ft_strncmp(char *s1, char *s2, int n);
 int			ft_isalnum(int c);
 void		*ft_memcpy(void *restrict dst, const void *restrict src, size_t n);
 void		*my_realloc(void *ptr, size_t old_size, size_t new_size);
+void    	ft_strncpy(char *s, char *d, int size);
 
 //TOKEN
 int			is_pipe(t_lexem **head, t_cursor *cursor);
@@ -119,5 +124,13 @@ t_ast_node	*parse_redirection_list(t_parser *parser);
 t_ast_node	*parse_redirection(t_parser *parser);
 t_ast_node	*parse_word(t_parser *parser);
 t_ast_node	*parse(t_lexem *lexem);
+
+//exec ast
+void		execute_ast(t_ast_node *node, char **env);
+
+//builtins
+void		ft_echo(char **args);
+void		ft_cd(char **args);
+void    	ft_pwd(char **args);
 
 #endif

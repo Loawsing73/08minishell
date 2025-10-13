@@ -1,5 +1,5 @@
 MAKEFLAGS += --no-print-directory
-NAME = parser
+NAME = minishell
 CC = cc
 CFLAGS = -Werror -Wextra -Wall -g
 LDFLAGS = -lreadline
@@ -13,10 +13,19 @@ SRCS = SRCS/parser.c \
 	   INCLUDES/LIB/memcpy.c \
 	   INCLUDES/LIB/realloc.c \
 	   INCLUDES/LIB/strchr.c \
+	   INCLUDES/LIB/strrchr.c \
 	   INCLUDES/LIB/strdup.c \
 	   INCLUDES/LIB/strtrim.c \
 	   INCLUDES/LIB/strncmp.c \
-	   INCLUDES/LIB/substr.c
+	   INCLUDES/LIB/substr.c \
+	   INCLUDES/LIB/strjoin.c \
+	   INCLUDES/LIB/split.c \
+	   INCLUDES/LIB/strncpy.c \
+	   ../BUILT-INS/execute_ast.c \
+	   ../BUILT-INS/echo.c \
+	   ../BUILT-INS/cd.c \
+	   ../BUILT-INS/pwd.c
+	   
 
 OBJS = $(SRCS:.c=.o)
 ECHO = echo -e
@@ -27,7 +36,7 @@ RESET = \033[0m
 all : $(NAME)
 $(NAME): $(OBJS)
 	@$(CC) $(CFLAGS) $(INCLUDES) -o $(NAME) $(OBJS) $(LDFLAGS)
-	@$(ECHO) "$(GREEN) executable PARSER created $(RESET)"
+	@$(ECHO) "$(GREEN) executable created $(RESET)"
 
 %.o: %.c
 	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@

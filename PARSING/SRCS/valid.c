@@ -2,7 +2,7 @@
 
 static int	pipe_end_beg(char *s)
 {
-	if (s[0] == '|')
+	if (s[0] == '|' || s[ft_strlen(s)-1] == '|')
 		return (0);
 	return (1);
 }
@@ -66,8 +66,7 @@ static int	special_caract(char *input)
 	{
 		if (input[i] == '\\' || input[i] == ';' || input[i] == '*'
 			|| input[i] == '[' || input[i] == ']' || input[i] == '('
-			|| input[i] == '#' || input[i] == '='
-			|| input[i] == '%' || input[i] == '!')
+			|| input[i] == '#' || input[i] == '%' || input[i] == '!')
 			return (0);
 		i++;
 	}
