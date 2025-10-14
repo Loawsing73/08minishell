@@ -7,6 +7,9 @@
 # include <fcntl.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+# include <sys/wait.h>
+
+# include "../../ENV/env.h"
 
 typedef enum e_token
 {
@@ -130,7 +133,7 @@ void		execute_ast(t_ast_node *node, char **env);
 
 //builtins
 void		ft_echo(char **args);
-void		ft_cd(char **args);
+void		ft_cd(char **args, char **env);
 void    	ft_pwd(char **args);
 
 #endif

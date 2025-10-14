@@ -26,31 +26,31 @@ static int	is_specific_cmd(char **arg)
 
 int is_builtins(char *cmd)
 {
-    if (ft_strncmp(cmd, "echo", ft_strlen(cmd)) == 0)
-        return (1);
+	if (ft_strncmp(cmd, "echo", ft_strlen(cmd)) == 0)
+		return (1);
 	if (ft_strncmp(cmd, "cd", ft_strlen(cmd)) == 0)
 		return (2);
 	if (ft_strncmp(cmd, "pwd", ft_strlen(cmd)) == 0)
 		return (3);
-    return (0);
+	return (0);
 }
-void    execute_builtins(char **args, int code)
+void    execute_builtins(char **args, char **env, int code)
 {
-    if (code == 1)
-     {   
-        ft_echo(args);
-        return ;
-     }
-	 if (code == 2)
-     {   
-        ft_cd(args);
-        return ;
-     }
-	 if (code == 3)
-     {   
-        ft_pwd(args);
-        return ;
-     }
+	if (code == 1)
+	{   
+		ft_echo(args);
+		return ;
+	}
+	if (code == 2)
+	{   
+		ft_cd(args, env);
+		return ;
+	}
+	if (code == 3)
+	{   
+		ft_pwd(args);
+		return ;
+	}
 } 
 static int has_heredocs(t_ast_node *pipeline)
 {
@@ -133,7 +133,7 @@ static int *prepare_all_heredocs(t_ast_node *pipeline, char **env)
 	int i, j, k;
 	t_ast_node *command;
 	t_ast_node *redir_node;
-	
+
 	(void)env;
 	heredoc_pipes = malloc(sizeof(int) * pipeline->child_count);
 	if (!heredoc_pipes)
@@ -178,7 +178,7 @@ static void handle_redirections(t_ast_node *redirection_node)
 	int         fd;
 	char        *filename;
 	t_ast_node  *redir;
-	
+
 	i = 0;
 	while (i < redirection_node->child_count)
 	{
@@ -281,7 +281,7 @@ static void execute_command(t_ast_node *command, char **env)
 	int     arg_count;
 
 	cmd_name = NULL;
-    cmd_path = NULL;
+	cmd_path = NULL;
 	args = NULL;
 	arg_count = 0;
 	i = 0;
@@ -322,15 +322,15 @@ static void execute_command(t_ast_node *command, char **env)
 	if (is_specific_cmd(args))
 		exeute_errors_specific(args);
 	else if (is_builtins(cmd_name))
-        execute_builtins(args, is_builtins(cmd_name));
+		execute_builtins(args, env, is_builtins(cmd_name));
 	else
-    {
-        cmd_path = find_command_in_path(cmd_name, env);
-	    execve(cmd_path, args, env);
-        perror("execve");
-	if (cmd_path != cmd_name)
-		free(cmd_path);
-    }
+	{
+		cmd_path = find_command_in_path(cmd_name, env);
+		execve(cmd_path, args, env);
+		perror("execve");
+		if (cmd_path != cmd_name)
+			free(cmd_path);
+	}
 	free(args);
 	exit(1);
 }
@@ -346,64 +346,64 @@ static void execute_pipeline(t_ast_node *pipeline, char **env)
 	char		*cmd_name;
 	int			is_single_builtin;
 	char		**args;
-    int			arg_count;
-    int			j;
-	
-    is_single_builtin = 0;
-    if (pipeline->child_count == 1)
-    {
-        command = pipeline->children[0];
-        cmd_name = NULL;
-        i = 0;
-        while (i < command->child_count)
-        {
-            if (command->children[i]->type == NODE_WORD)
-            {
-                cmd_name = command->children[i]->value;
-                break;
-            }
-            i++;
-        }
-        if (cmd_name && is_builtins(cmd_name))
-            is_single_builtin = 1;
-    }
-    if (is_single_builtin)
-    {
-        arg_count = 0;
-        j = 1;
-        command = pipeline->children[0];
-        cmd_name = NULL;
-        i = 0;
-        while (i < command->child_count)
-        {
-            if (command->children[i]->type == NODE_WORD)
-                cmd_name = command->children[i]->value;
-            else if (command->children[i]->type == NODE_ARGUMENT)
-                arg_count = command->children[i]->child_count;
-            i++;
-        }
-        args = malloc(sizeof(char *) * (arg_count + 2));
-        args[0] = cmd_name;
-        j = 1;
-        i = 0;
-        while (i < command->child_count)
-        {
-            if (command->children[i]->type == NODE_ARGUMENT)
-            {
-                int k = 0;
-                while (k < command->children[i]->child_count)
-                {
-                    args[j++] = command->children[i]->children[k]->value;
-                    k++;
-                }
-            }
-            i++;
-        }
-        args[j] = NULL;
-        execute_builtins(args, is_builtins(cmd_name));
-        free(args);
-        return ;
-    }
+	int			arg_count;
+	int			j;
+
+	is_single_builtin = 0;
+	if (pipeline->child_count == 1)
+	{
+		command = pipeline->children[0];
+		cmd_name = NULL;
+		i = 0;
+		while (i < command->child_count)
+		{
+			if (command->children[i]->type == NODE_WORD)
+			{
+				cmd_name = command->children[i]->value;
+				break;
+			}
+			i++;
+		}
+		if (cmd_name && is_builtins(cmd_name))
+			is_single_builtin = 1;
+	}
+	if (is_single_builtin)
+	{
+		arg_count = 0;
+		j = 1;
+		command = pipeline->children[0];
+		cmd_name = NULL;
+		i = 0;
+		while (i < command->child_count)
+		{
+			if (command->children[i]->type == NODE_WORD)
+				cmd_name = command->children[i]->value;
+			else if (command->children[i]->type == NODE_ARGUMENT)
+				arg_count = command->children[i]->child_count;
+			i++;
+		}
+		args = malloc(sizeof(char *) * (arg_count + 2));
+		args[0] = cmd_name;
+		j = 1;
+		i = 0;
+		while (i < command->child_count)
+		{
+			if (command->children[i]->type == NODE_ARGUMENT)
+			{
+				int k = 0;
+				while (k < command->children[i]->child_count)
+				{
+					args[j++] = command->children[i]->children[k]->value;
+					k++;
+				}
+			}
+			i++;
+		}
+		args[j] = NULL;
+		execute_builtins(args, env, is_builtins(cmd_name));
+		free(args);
+		return ;
+	}
 	heredoc_pipes = prepare_all_heredocs(pipeline, env);
 	if (!heredoc_pipes && has_heredocs(pipeline))
 	{

@@ -1,6 +1,13 @@
 #include "../PARSING/INCLUDES/token.h"
 
-static int get_rindex(char *path)
+void	ft_cd(char **args, char **env)
+{
+	(void)args;
+	printf("env test %s\n", env[0]);
+	printf("Buil-in cd\n");
+}
+
+/*static int get_rindex(char *path)
 {
     int i;
     
@@ -56,7 +63,7 @@ void ft_cd(char **args)
         status = chdir(args[1]);
     if (status == -1)
         perror("chdir");
-}
+}*/
 
 /*int main(int ac, char **av)
 {

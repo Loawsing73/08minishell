@@ -220,6 +220,7 @@ int main(int ac, char **ag, char **env)
 	
 	(void)ac;
 	(void)ag;
+	create_env(env);
 	while (1)
 	{
 		input = readline("minishell >> ");

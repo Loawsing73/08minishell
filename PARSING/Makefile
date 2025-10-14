@@ -24,7 +24,9 @@ SRCS = SRCS/parser.c \
 	   ../BUILT-INS/execute_ast.c \
 	   ../BUILT-INS/echo.c \
 	   ../BUILT-INS/cd.c \
-	   ../BUILT-INS/pwd.c
+	   ../BUILT-INS/pwd.c \
+	   ../ENV/create_env.c \
+	   ../ENV/env_utils.c
 	   
 
 OBJS = $(SRCS:.c=.o)
