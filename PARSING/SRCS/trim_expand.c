@@ -1,8 +1,5 @@
 #include "../INCLUDES/token.h"
 
-//gardera index a jour 
-#include "../INCLUDES/token.h"
-
 static int	skip_variable(char *s, int i)
 {
 	while (s[i] && (ft_isalnum(s[i]) || s[i] == '_'))
@@ -90,7 +87,7 @@ static int	expand_variable(char *s, char *d, int *i, int *j, char **env)
 	}
 	return (0);
 }
-
+/*gère intérieur de dquote avec ascii négatif et exand variable env*/
 static void	filldquote(char *s, char *d, int *i, int *j, char **env)
 {
 	int	limit;
@@ -117,7 +114,7 @@ static void	filldquote(char *s, char *d, int *i, int *j, char **env)
 	}
 	(*i)++;
 }
-
+/*gère l'intérieur des dquote dans le cas d'un heredoc avec ascii négatif*/
 static void	fill_exp_dquote(char *s, char *d, int *i, int *j)
 {
 	int	limit;
@@ -132,7 +129,7 @@ static void	fill_exp_dquote(char *s, char *d, int *i, int *j)
 	}
 	(*i)++;
 }
-
+/*gère l'intérieur des quote avec ascii négatif*/
 static void fillquote(char *s, char *d, int *i, int *j)
 {
 	(*i)++;
@@ -147,7 +144,7 @@ static void fillquote(char *s, char *d, int *i, int *j)
 	}
 	(*i)++;
 }
-
+/*prend la plus grande variable de l'env pour le malloc safe*/
 static int	max_env(char **env, char *s)
 {
 	int	i;
@@ -165,7 +162,7 @@ static int	max_env(char **env, char *s)
 	}
 	return (max + 100);
 }
-
+/*remplit dest à partir de src et garde indice à jour*/
 static void	fill(char *s, char *d, int *i, int *j)
 {
 	d[*j] = s[*i];
@@ -189,7 +186,7 @@ static void	expand_heredoc(char *s, char *d, int *i, int *j)
 			fill(s, d, i, j);
 	}
 }
-
+/*bool : $$*/
 static int	consecutive_dollar(char *s, int i)
 {
 	i++;
@@ -197,7 +194,7 @@ static int	consecutive_dollar(char *s, int i)
 		return (1);
 	return (0);
 }
-
+/*bool : >> <<*/
 static int	consecutive_angbra(char *s, int i)
 {
 	i++;
@@ -205,7 +202,7 @@ static int	consecutive_angbra(char *s, int i)
 		return (1);
 	return (0);
 }
-
+/*fonction principale de parsing pour expandre et gérer heredoc et quote*/
 char	*concate_hell(char *s, char **env)
 {
 	int i;

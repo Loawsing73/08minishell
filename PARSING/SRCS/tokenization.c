@@ -1,5 +1,7 @@
 #include "../INCLUDES/token.h"
 
+/*bool pour savoir si |
+si oui, crée un node*/
 int	is_pipe(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
@@ -48,7 +50,8 @@ int	is_word(t_lexem **head, t_cursor *cu)
 			ft_substr(cu->input, cu->position, index));
 	return (switch_token(token, cu), index);
 }
-
+/*bool pour savoir si < ou <<
+si oui, crée node*/
 int	is_less(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
@@ -71,7 +74,8 @@ int	is_less(t_lexem **head, t_cursor *cursor)
 		return (switch_token(token, cursor), 1);
 	}
 }
-
+/*bool pour savoir si > ou >>
+si oui, crée node*/
 int	is_great(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
@@ -94,7 +98,7 @@ int	is_great(t_lexem **head, t_cursor *cursor)
 		return (switch_token(token, cursor), 1);
 	}
 }
-
+/*trouve char c dans string et return l'index*/
 int	get_index(int position, char *s, char c)
 {
 	while (s[position])
@@ -105,7 +109,7 @@ int	get_index(int position, char *s, char c)
 	}
 	return (-280300);
 }
-
+/*trouve espace dans string et return l'index*/
 int	get_space(int position, char *s)
 {
 	while (s[position])
@@ -116,7 +120,7 @@ int	get_space(int position, char *s)
 	}
 	return (ft_strlen(s));
 }
-
+/*associe opérateur à token*/
 t_token	get_token(char c)
 {
 	if (!c)
@@ -130,13 +134,13 @@ t_token	get_token(char c)
 	else
 		return (ERROR);
 }
-
+/*base de la structure de liste chainee, actualise le token actuel et le précédent*/
 void	switch_token(t_token token, t_cursor *cursor)
 {
 	cursor->previous = cursor->current;
 	cursor->current = token;
 }
-
+/*ajoute node à liste chainée*/
 t_lexem	*create_node(t_lexem *head, t_token token, char *input)
 {
 	t_lexem	*node;
@@ -156,7 +160,7 @@ t_lexem	*create_node(t_lexem *head, t_token token, char *input)
 	current->next = node;
 	return (head);
 }
-
+/*fonction principale du parsing de l'input*/
 t_lexem *parsing_input(t_cursor *cursor, char *input)
 {
 	t_lexem	*head;
@@ -182,7 +186,7 @@ t_lexem *parsing_input(t_cursor *cursor, char *input)
 	}
 	return (head);
 }
-
+/*free liste chainee*/
 void	free_lexem_list(t_lexem *head)
 {
 	t_lexem	*current;
@@ -236,11 +240,14 @@ int main(int ac, char **ag, char **env)
 		}
 		if (*input)
 			add_history(input);
-		if (valid_input(ft_strtrim(input, " ")))
+		/*j'enlève espace avant et après + je m'assure que l'input est valide*/
+			if (valid_input(ft_strtrim(input, " ")))
 		{
+			/*si valide => expander + gère "e"'ch'"o"*/
 			joined = concate_hell(input, env);
 			 //clean_neg_ascii(joined);
 			printf("%s\n", joined);
+			/*parse input => liste chainée*/
 			head = parsing_input(&cursor, joined);
 			current = head;
 			while (current)
@@ -248,6 +255,7 @@ int main(int ac, char **ag, char **env)
 				printf("token = %u, input = %s\n", current->token, current->input);
 				current = current->next;
 			}
+			/*pase liste chainée => ast*/
 			t_ast_node *ast = parse(head);
 			if (ast)
 			{
