@@ -1,4 +1,4 @@
-#include "../../minishell.h"
+#include "../../includes/minishell.h"
 
 // creer node ast
 t_ast_node	*create_node_ast(t_node_type type, char *value)

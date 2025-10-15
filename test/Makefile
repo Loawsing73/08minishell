@@ -21,7 +21,9 @@ SRCS = src/main.c \
 	   src/lib/strncpy.c \
 	   src/lib/strrchr.c \
 	   src/lib/strtrim.c \
-	   src/lib/substr.c
+	   src/lib/substr.c \
+	   src/built-in/echo.c \
+	   src/exec/execute_ast.c
 
 
 OBJS = $(SRCS:.c=.o)
