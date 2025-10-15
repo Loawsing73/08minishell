@@ -1,5 +1,5 @@
 #include "../../includes/minishell.h"
-
+/*bool pour savoir si n après -n*/
 static int flag_n(char *arg)
 {
     int i;
@@ -13,7 +13,9 @@ static int flag_n(char *arg)
     }
     return (1);
 }
-
+/*tant que -nn, avance + flag
+puis imprime
+si flag, alors imprime pas newline*/
 void ft_echo(char **args)
 {
 	int i;
