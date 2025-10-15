@@ -9,7 +9,19 @@ SRCS = src/main.c \
        src/parsing/rendering.c \
        src/parsing/tokenization.c \
        src/parsing/trim_expand.c \
-       src/parsing/valid.c
+       src/parsing/valid.c \
+	   src/lib/isalnum.c \
+	   src/lib/memcpy.c \
+	   src/lib/realloc.c \
+	   src/lib/split.c \
+	   src/lib/strchr.c \
+	   src/lib/strdup.c \
+	   src/lib/strjoin.c \
+	   src/lib/strncmp.c \
+	   src/lib/strncpy.c \
+	   src/lib/strrchr.c \
+	   src/lib/strtrim.c \
+	   src/lib/substr.c
 
 
 OBJS = $(SRCS:.c=.o)
