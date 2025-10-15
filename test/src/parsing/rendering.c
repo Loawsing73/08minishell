@@ -1,4 +1,5 @@
-#include "../INCLUDES/token.h"
+#include "../../includes/minishell.h"
+
 void print_ast(t_ast_node *node, int indent)
 {
     int i;

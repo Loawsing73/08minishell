@@ -1,4 +1,4 @@
-#include "../INCLUDES/token.h"
+#include "../../includes/minishell.h"
 
 static int	pipe_end_beg(char *s)
 {

@@ -1,4 +1,4 @@
-#include "../INCLUDES/token.h"
+#include "../../includes/minishell.h"
 
 int	is_pipe(t_lexem **head, t_cursor *cursor)
 {
