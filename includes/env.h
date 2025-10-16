@@ -17,12 +17,16 @@
 #include <stdlib.h>
 
 typedef struct s_env{
-	char	*name;
-	char	*value;
-	char	*next;
+	char			*name;
+	char			*value;
+	struct s_env	*next;
 }	t_env;
 
+//env_utils.c
 t_env	*new_var(char *name, char *value);
-void	create_env(char **env);
+void	print_env(t_env *env);
+
+//create_env.c
+t_env	*create_env(char **env);
 
 #endif

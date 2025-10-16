@@ -14,5 +14,7 @@
 # include "lib.h"
 # include "built_in.h"
 # include "exec.h"
+# include "env.h"
+# include "ft_free.h"
 
 #endif

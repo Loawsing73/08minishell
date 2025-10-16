@@ -8,6 +8,7 @@ char            *ft_strtrim(char *s1, char *set);
 char            *ft_strjoin(char *s1, char *s2);
 char            *ft_strrchr(const char *s, int c);
 char            **ft_split(char const *s, char c);
+char			**split_env(char *str, char c);
 int                     ft_strlen(char *s);
 int                     ft_strncmp(char *s1, char *s2, int n);
 int                     ft_isalnum(int c);

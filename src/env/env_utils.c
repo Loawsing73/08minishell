@@ -10,17 +10,29 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "env.h"
+# include "../../includes/minishell.h"
 
 t_env	*new_var(char *name, char *value)
 {
 	t_env	*new;
 
-	new = malloc(sizeof(t_env *));
+	new = malloc(sizeof(*new));
 	if (!new)
 		return (NULL);
 	new->name = name;
 	new->value = value;
 	new->next = NULL;
 	return (new);
+}
+
+void	print_env(t_env *env)
+{
+	t_env *tmp;
+
+	tmp = env;
+	while (tmp)
+	{
+		printf("Name -> %s | Value %s\n", tmp->name, tmp->value);
+		tmp = tmp->next;
+	}
 }
