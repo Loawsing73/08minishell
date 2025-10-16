@@ -28,6 +28,8 @@ int is_builtins(char *cmd)
 {
 	if (ft_strncmp(cmd, "echo", ft_strlen(cmd)) == 0)
 		return (1);
+	if (ft_strncmp(cmd, "cd", ft_strlen(cmd)) == 0)
+		return (2);
 	return (0);
 }
 void    execute_builtins(char **args, char **env, int code)
@@ -38,6 +40,7 @@ void    execute_builtins(char **args, char **env, int code)
 		ft_echo(args);
 		return ;
 	}
+	if (code == 2)
 } 
 static int has_heredocs(t_ast_node *pipeline)
 {
