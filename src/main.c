@@ -5,12 +5,13 @@ int main(int ac, char **ag, char **env)
 	char *input;
 	char *joined;
 	t_lexem *head;
+	t_env	*new_env;
 	//t_lexem *current;
 	t_cursor cursor = {0};
 
 	(void)ac;
 	(void)ag;
-	create_env(env);
+	new_env = create_env(env);
 	while (1)
 	{
 		input = readline("minishell >> ");

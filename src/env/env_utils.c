@@ -36,3 +36,19 @@ void	print_env(t_env *env)
 		tmp = tmp->next;
 	}
 }
+
+char	*find_var(char *name, t_env *env)
+{
+	t_env	*tmp;
+
+	if (!name || !env)
+		return (NULL);
+	tmp = env;
+	while (tmp)
+	{
+		if (ft_strncmp(name, tmp->name, ft_strlen(name)) == 0)
+			break ;
+		tmp = tmp->next;
+	}
+	return (tmp->value);
+}
