@@ -1,5 +1,5 @@
 #include "../../includes/minishell.h"
-
+/*si input "." => msg d'erreur spécial dans bash*/
 static void	exeute_errors_specific(char **arg)
 {
 	if (ft_strncmp(arg[0], ".", 2) == 0)
@@ -17,21 +17,24 @@ static void	exeute_errors_specific(char **arg)
 	}
 
 }
+/*bool : "." ou ".." seul*/
 static int	is_specific_cmd(char **arg)
 {
 	if (ft_strncmp(arg[0], ".", 2) == 0 || ft_strncmp(arg[0], "..", 2) == 0)
 		return (1);
 	return (0);
 }
-
+/*bool : buitins => renvoie code pou savoir quel builtin*/
 int is_builtins(char *cmd)
 {
-	if (ft_strncmp(cmd, "echo", ft_strlen(cmd)) == 0)
+	if (ft_strncmp(cmd, "echo", ft_strlen("echo")) == 0)
 		return (1);
 	if (ft_strncmp(cmd, "cd", ft_strlen(cmd)) == 0)
 		return (2);
 	return (0);
 }
+
+/*execute le builtin en fonction du code renvoyé*/
 void    execute_builtins(char **args, t_env *new_env, int code)
 {
 	(void)new_env;
@@ -159,7 +162,7 @@ static int *prepare_all_heredocs(t_ast_node *pipeline)
 	}
 	return (heredoc_pipes);
 }
-
+/*gère >>, > et <*/
 static void handle_redirections(t_ast_node *redirection_node)
 {
 	int         i;
@@ -171,10 +174,10 @@ static void handle_redirections(t_ast_node *redirection_node)
 	while (i < redirection_node->child_count)
 	{
 		redir = redirection_node->children[i];
-		if (ft_strncmp(redir->value, ">", 2) == 0)
+		if (ft_strncmp(redir->value, ">>", 3) == 0)
 		{
 			filename = redir->children[0]->value;
-			fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 			if (fd == -1)
 			{
 				perror("open");
@@ -183,10 +186,10 @@ static void handle_redirections(t_ast_node *redirection_node)
 			dup2(fd, STDOUT_FILENO);
 			close(fd);
 		}
-		else if (ft_strncmp(redir->value, ">>", 2) == 0)
+		else if (ft_strncmp(redir->value, ">", 2) == 0)
 		{
 			filename = redir->children[0]->value;
-			fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			if (fd == -1)
 			{
 				perror("open");
@@ -244,6 +247,10 @@ static char	*find_command_in_path(char *cmd, t_env *env)
 }
 
 static void execute_command(t_ast_node *command, t_env *env)
+/*si word = args[0]
+si argument, remplit args[i]
+puis regarde args[0], regarde si cas spécifique (.) 
+puis regarde si c'est builtin*/
 {
 	char    *cmd_name;
 	char    *cmd_path;
@@ -252,7 +259,7 @@ static void execute_command(t_ast_node *command, t_env *env)
 	int     i;
 	int     j;
 	int     arg_count;
-
+	
 	cmd_name = NULL;
 	cmd_path = NULL;
 	args = NULL;
@@ -288,9 +295,9 @@ static void execute_command(t_ast_node *command, t_env *env)
 	i = 0;
 	while (i < command->child_count)
 	{
-		if (command->children[i]->type == NODE_REDIRECTION)
-			handle_redirections(command->children[i]);
-		i++;
+    	if (command->children[i]->type == NODE_REDIRECTION)
+        	handle_redirections(command->children[i]);
+    	i++;
 	}
 	if (is_specific_cmd(args))
 		exeute_errors_specific(args);
@@ -336,7 +343,7 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 			if (command->children[i]->type == NODE_WORD)
 			{
 				cmd_name = command->children[i]->value;
-				break;
+				break ;
 			}
 			i++;
 		}
@@ -408,6 +415,7 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 			{
 				dup2(heredoc_pipes[i], STDIN_FILENO);
 				close(heredoc_pipes[i]);
+				heredoc_pipes[i] = -1;
 			}
 			else if (prev_pipe[0] != -1)
 			{
@@ -422,18 +430,25 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 				close(curr_pipe[1]);
 			}
 			cleanup_heredoc_pipes(heredoc_pipes, pipeline->child_count);
-			execute_command(command, new_env);
+			if (command->type == NODE_PIPELINE)
+        		execute_pipeline(command, new_env);  // Récursif
+    		else if (command->type == NODE_COMMAND)
+        		execute_command(command, new_env);
+    		else
+				exit(1);
 			exit(0);
 		}
 		if (prev_pipe[0] != -1)
 		{
 			close(prev_pipe[0]);
-			close(prev_pipe[1]);
+			if (prev_pipe[1] != -1)  // ✅ Vérifier avant de fermer
+        		close(prev_pipe[1]);
 		}
 		if (i < pipeline->child_count - 1)
 		{
+			close(curr_pipe[1]);
 			prev_pipe[0] = curr_pipe[0];
-			prev_pipe[1] = curr_pipe[1];
+			prev_pipe[1] = -1;
 		}
 		i++;
 	}

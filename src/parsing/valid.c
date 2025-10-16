@@ -1,12 +1,13 @@
 #include "../../includes/minishell.h"
 
+/*s'assure qu'input finit ou commence pas par |*/
 static int	pipe_end_beg(char *s)
 {
 	if (s[0] == '|' || s[ft_strlen(s)-1] == '|')
 		return (0);
 	return (1);
 }
-
+/*peut pas avoir "> >"*/
 static int	far_angbra(char *s)
 {
 	int	i;
@@ -31,7 +32,7 @@ static int	far_angbra(char *s)
 	}
 	return (1);
 }
-
+/*peut pas ">>>" ou "<<<"*/
 static int	triple_angbra(char *s)
 {
 	int	i;
@@ -56,7 +57,7 @@ static int	triple_angbra(char *s)
 	}
 	return (1);
 }
-
+/*caractere pas pris en charge*/
 static int	special_caract(char *input)
 {
 	int	i;
@@ -66,13 +67,14 @@ static int	special_caract(char *input)
 	{
 		if (input[i] == '\\' || input[i] == ';' || input[i] == '*'
 			|| input[i] == '[' || input[i] == ']' || input[i] == '('
-			|| input[i] == '#' || input[i] == '%' || input[i] == '!')
+			|| input[i] == '#' || input[i] == '%' || input[i] == '!'
+			|| input[i] == ')')
 			return (0);
 		i++;
 	}
 	return (1);
 }
-
+/*s'assure que quote bien fermée*/
 static int	ft_quote(char *s, int *i)
 {
 	(*i)++;
@@ -84,7 +86,7 @@ static int	ft_quote(char *s, int *i)
 	}
 	return (0);
 }
-
+/*s'assure que dquote bien fermée*/
 static int	ft_dquote(char *s, int *i)
 {
 	(*i)++;

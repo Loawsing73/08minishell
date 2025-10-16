@@ -1,5 +1,5 @@
 #include "../../includes/minishell.h"
-
+/* si | alors crée node avce token PIPE*/
 int	is_pipe(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
@@ -12,7 +12,9 @@ int	is_pipe(t_lexem **head, t_cursor *cursor)
 	switch_token(token, cursor);
 	return (1);
 }
-
+/*si >, <, >> alors token IO_LOCA car redirection
+si << alors token DELIMITER
+sinon, on va jusqu'au premier oprateur et créee node word avec substr de l'input*/
 int	is_word(t_lexem **head, t_cursor *cu)
 {
 	t_token	token;
@@ -48,7 +50,8 @@ int	is_word(t_lexem **head, t_cursor *cu)
 			ft_substr(cu->input, cu->position, index));
 	return (switch_token(token, cu), index);
 }
-
+/*si < crée node LESS
+si << crée node DLESS*/
 int	is_less(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
@@ -71,7 +74,8 @@ int	is_less(t_lexem **head, t_cursor *cursor)
 		return (switch_token(token, cursor), 1);
 	}
 }
-
+/*si >crée node GREAT
+si >> crée node DGREAT*/
 int	is_great(t_lexem **head, t_cursor *cursor)
 {
 	t_token	token;
@@ -94,7 +98,7 @@ int	is_great(t_lexem **head, t_cursor *cursor)
 		return (switch_token(token, cursor), 1);
 	}
 }
-
+/*ret index de char c dans string*/
 int	get_index(int position, char *s, char c)
 {
 	while (s[position])
@@ -105,7 +109,7 @@ int	get_index(int position, char *s, char c)
 	}
 	return (-280300);
 }
-
+/*ret index de premier espace rencontré*/
 int	get_space(int position, char *s)
 {
 	while (s[position])
@@ -116,7 +120,7 @@ int	get_space(int position, char *s)
 	}
 	return (ft_strlen(s));
 }
-
+/*token d'opérateur*/
 t_token	get_token(char c)
 {
 	if (!c)
@@ -130,7 +134,7 @@ t_token	get_token(char c)
 	else
 		return (ERROR);
 }
-
+/*actualise token actuel et token précédent*/
 void	switch_token(t_token token, t_cursor *cursor)
 {
 	cursor->previous = cursor->current;
@@ -156,7 +160,11 @@ t_lexem	*create_node(t_lexem *head, t_token token, char *input)
 	current->next = node;
 	return (head);
 }
-
+/*fonction principale de pasring de l'output :
+tant que espace, avance
+si |, crée node PIPE
+si <, <<, >, >> crée node correpondant
+else c'est un word*/
 t_lexem *parsing_input(t_cursor *cursor, char *input)
 {
 	t_lexem	*head;

@@ -107,6 +107,7 @@ t_ast_node	*parse_pipeline(t_parser *parser)
 	t_ast_node	*pipeline;
 	t_ast_node	*command;
 	t_ast_node	*next_pipeline;
+	int			i;
 
 	pipeline = create_node_ast(NODE_PIPELINE, NULL);
 	command = parse_command(parser);
@@ -121,8 +122,28 @@ t_ast_node	*parse_pipeline(t_parser *parser)
 		consum_token(parser);
 		next_pipeline = parse_pipeline(parser);
 		if (next_pipeline)
-			add_child(pipeline, next_pipeline);
+		{
+			{
+				i = 0;
+				while (i < next_pipeline->child_count)
+				{
+					add_child(pipeline, next_pipeline->children[i]);
+					i++;
+				}
+				free(next_pipeline->children);
+				free(next_pipeline->value);
+				free(next_pipeline);
+			}
+		}
 	}
+	if (pipeline->child_count == 1 && pipeline->children[0]->type == NODE_PIPELINE)
+    {
+        t_ast_node *inner = pipeline->children[0];
+        free(pipeline->children);
+        free(pipeline->value);
+        free(pipeline);
+        return (inner);
+    }
 	return (pipeline);
 }
 
@@ -170,8 +191,10 @@ t_ast_node *parse_command(t_parser *parser)
 			else
 			{
 				arg = parse_word(parser);
-				if (arg)
-					add_child(args, arg);
+    			if (arg && arg->value && arg->value[0] != '\0')
+        			add_child(args, arg);
+    			else if (arg)
+        			free_ast(arg);
 			}
 		}
 		else if (parser->current->token == D_LESS)

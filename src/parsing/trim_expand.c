@@ -205,7 +205,8 @@ static int	consecutive_angbra(char *s, int i)
 		return (1);
 	return (0);
 }
-
+/*fonction principale de parsing:
+*/
 char	*concate_hell(char *s, char **env)
 {
 	int i;
