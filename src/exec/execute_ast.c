@@ -32,15 +32,14 @@ int is_builtins(char *cmd)
 		return (2);
 	return (0);
 }
-void    execute_builtins(char **args, char **env, int code)
+void    execute_builtins(char **args, t_env *new_env, int code)
 {
-	(void)env;
+	(void)new_env;
 	if (code == 1)
 	{   
 		ft_echo(args);
 		return ;
 	}
-	if (code == 2)
 } 
 static int has_heredocs(t_ast_node *pipeline)
 {
@@ -117,14 +116,13 @@ static int handle_heredoc(char *delimiter)
 	return (pipe_fd[0]);
 }
 
-static int *prepare_all_heredocs(t_ast_node *pipeline, char **env)
+static int *prepare_all_heredocs(t_ast_node *pipeline)
 {
 	int *heredoc_pipes;
 	int i, j, k;
 	t_ast_node *command;
 	t_ast_node *redir_node;
 
-	(void)env;
 	heredoc_pipes = malloc(sizeof(int) * pipeline->child_count);
 	if (!heredoc_pipes)
 		return (NULL);
@@ -213,59 +211,44 @@ static void handle_redirections(t_ast_node *redirection_node)
 	}
 }
 
-static char *find_command_in_path(char *cmd, char **env)
+static char	*find_command_in_path(char *cmd, t_env *env)
 {
-	char	*path_env;
-	char	**paths;
+	char	*value_path;
+	char	*tmp;
 	char	*full_path;
-	char	*temp;
-	int		i;
+	char	**paths;
+	int		x;
 
-	if (!cmd || ft_strchr(cmd, '/'))
-		return (cmd);
-	path_env = NULL;
-	i = 0;
-	while (env[i])
+	x = 0;
+	value_path = find_var("PATH", env);
+	if (!value_path)
+		return (NULL);
+	paths = ft_split(value_path, ':');
+	if (!paths)
+		return (free(value_path), NULL);
+	while (paths[x])
 	{
-		if (ft_strncmp(env[i], "PATH=", 5) == 0)
-		{
-			path_env = env[i] + 5;
-			break ;
-		}
-		i++;
-	}
-	if (!path_env)
-		return (cmd);
-	paths = ft_split(path_env, ':');
-	i = 0;
-	while (paths[i])
-	{
-		temp = ft_strjoin(paths[i], "/");
-		full_path = ft_strjoin(temp, cmd);
-		free(temp);
+		tmp = ft_strjoin(paths[x], "/");
+		full_path = ft_strjoin(tmp, cmd);
+		free(tmp);
 		if (access(full_path, X_OK) == 0)
 		{
-			i = 0;
-			while (paths[i])
-				free(paths[i++]);
-			free(paths);
+			free_tab(paths);
 			return (full_path);
 		}
 		free(full_path);
-		i++;
+		x++;
 	}
-	i = 0;
-	while (paths[i])
-		free(paths[i++]);
-	free(paths);
+	free_tab(paths);
 	return (cmd);
 }
 
-static void execute_command(t_ast_node *command, char **env)
+static void execute_command(t_ast_node *command, t_env *env)
 {
 	char    *cmd_name;
 	char    *cmd_path;
 	char    **args;
+	char	**tab_env;
 	int     i;
 	int     j;
 	int     arg_count;
@@ -316,7 +299,10 @@ static void execute_command(t_ast_node *command, char **env)
 	else
 	{
 		cmd_path = find_command_in_path(cmd_name, env);
-		execve(cmd_path, args, env);
+		tab_env = convert_env_to_tab(env);
+		if (!tab_env)
+			return ;
+		execve(cmd_path, args, tab_env);
 		perror("execve");
 		if (cmd_path != cmd_name)
 			free(cmd_path);
@@ -325,7 +311,7 @@ static void execute_command(t_ast_node *command, char **env)
 	exit(1);
 }
 
-static void execute_pipeline(t_ast_node *pipeline, char **env)
+static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 {
 	int			i;
 	int			prev_pipe[2];
@@ -390,11 +376,11 @@ static void execute_pipeline(t_ast_node *pipeline, char **env)
 			i++;
 		}
 		args[j] = NULL;
-		execute_builtins(args, env, is_builtins(cmd_name));
+		execute_builtins(args, new_env, is_builtins(cmd_name));
 		free(args);
 		return ;
 	}
-	heredoc_pipes = prepare_all_heredocs(pipeline, env);
+	heredoc_pipes = prepare_all_heredocs(pipeline);
 	if (!heredoc_pipes && has_heredocs(pipeline))
 	{
 		perror("heredoc preparation failed");
@@ -436,7 +422,7 @@ static void execute_pipeline(t_ast_node *pipeline, char **env)
 				close(curr_pipe[1]);
 			}
 			cleanup_heredoc_pipes(heredoc_pipes, pipeline->child_count);
-			execute_command(command, env);
+			execute_command(command, new_env);
 			exit(0);
 		}
 		if (prev_pipe[0] != -1)
@@ -460,7 +446,7 @@ static void execute_pipeline(t_ast_node *pipeline, char **env)
 	}
 }
 
-void execute_ast(t_ast_node *node, char **env)
+void execute_ast(t_ast_node *node, t_env *env)
 {
 	if (!node)
 		return ;

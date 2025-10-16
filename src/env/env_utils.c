@@ -52,3 +52,43 @@ char	*find_var(char *name, t_env *env)
 	}
 	return (tmp->value);
 }
+
+int	get_size_env(t_env *env)
+{
+	t_env *tmp;
+	int	count;
+
+	count = 0;
+	tmp = env;
+	while (tmp)
+	{
+		count++;
+		tmp = tmp->next;
+	}
+	return (count);
+}
+
+char	**convert_env_to_tab(t_env *env)
+{
+	t_env	*tmp;
+	char	**tab_env;
+	char	*join;
+	int		size_env;
+	int		x;
+
+	tab_env = NULL;
+	size_env = get_size_env(env);
+	tab_env = malloc(sizeof(char *) * (size_env + 1));
+	if (!tab_env)
+		return (NULL);
+	tmp = env;
+	x = 0;
+	while (tmp)
+	{
+		join = ft_strjoin(tmp->name, "=");
+		tab_env[x] = ft_strjoin(join, tmp->value);
+		x++;
+		tmp = tmp->next;
+	}
+	return (tab_env);
+}

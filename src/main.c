@@ -44,7 +44,7 @@ int main(int ac, char **ag, char **env)
 			if (ast)
 			{
 				//      print_ast(ast, 0);
-				execute_ast(ast, env);
+				execute_ast(ast, new_env);
 				free_ast(ast);
 			}
 			else
