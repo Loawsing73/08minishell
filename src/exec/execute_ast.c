@@ -440,7 +440,7 @@ static void execute_pipeline(t_ast_node *pipeline, char **env)
 			}
 			cleanup_heredoc_pipes(heredoc_pipes, pipeline->child_count);
 			if (command->type == NODE_PIPELINE)
-        		execute_pipeline(command, env);  // Récursif
+        		execute_pipeline(command, env);
     		else if (command->type == NODE_COMMAND)
         		execute_command(command, env);
     		else
@@ -450,7 +450,7 @@ static void execute_pipeline(t_ast_node *pipeline, char **env)
 		if (prev_pipe[0] != -1)
 		{
 			close(prev_pipe[0]);
-			if (prev_pipe[1] != -1)  // ✅ Vérifier avant de fermer
+			if (prev_pipe[1] != -1)
         		close(prev_pipe[1]);
 		}
 		if (i < pipeline->child_count - 1)
