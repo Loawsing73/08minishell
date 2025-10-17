@@ -109,3 +109,17 @@ void	update_var(char *name, char *new_content, t_env *env)
 	free(tmp->value);
 	tmp->value = new_content;
 }
+
+void	print_var(char *name, t_env *env)
+{
+	t_env *tmp;
+
+	tmp = env;
+	while (tmp)
+	{
+		if (ft_strncmp(name, tmp->name, ft_strlen(name)) == 0)
+			break ;
+		tmp = tmp->next;
+	}
+	printf("NAME %s | Value %s\n", tmp->name, tmp->value);
+}
