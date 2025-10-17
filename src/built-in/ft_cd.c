@@ -6,7 +6,6 @@ int	ft_cd(char	**args, t_env *env)
     char    *new_path;
 	char	*current_path;
 
-    printf("ft_cd\n");
     if (!args[1] || ft_strncmp(args[1], "~", ft_strlen(args[1])) == 0)
     {
 		current_path = find_var("PWD", env);
