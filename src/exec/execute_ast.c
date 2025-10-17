@@ -35,14 +35,12 @@ int is_builtins(char *cmd)
 }
 
 /*execute le builtin en fonction du code renvoyé*/
-void    execute_builtins(char **args, t_env *new_env, int code)
+void    execute_builtins(char **args, t_env *env, int code)
 {
-	(void)new_env;
 	if (code == 1)
-	{   
 		ft_echo(args);
-		return ;
-	}
+    else if (code == 2)
+        ft_cd(args, env);
 } 
 static int has_heredocs(t_ast_node *pipeline)
 {
