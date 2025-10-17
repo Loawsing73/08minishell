@@ -106,7 +106,6 @@ void	update_var(char *name, char *new_content, t_env *env)
 			break ;
 		tmp = tmp->next;
 	}
-	free(tmp->value);
 	tmp->value = new_content;
 }
 
