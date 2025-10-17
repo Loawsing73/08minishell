@@ -15,6 +15,7 @@ void	ft_cd(char	**args, t_env *env)
         new_path = find_var("HOME", env);
         if (!new_path)
             return ; // Peut être afficher un msg ? et free old_path si il existe
+		update_var("OLDPWD", current_path, env);
 		chdir(new_path);
     }
 	return ;
