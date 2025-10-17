@@ -92,3 +92,20 @@ char	**convert_env_to_tab(t_env *env)
 	}
 	return (tab_env);
 }
+
+void	update_var(char *name, char *new_content, t_env *env)
+{
+	t_env	*tmp;
+
+	if (!new_content)
+		return ;
+	tmp = env;
+	while (tmp)
+	{
+		if (ft_strncmp(name, tmp->name, ft_strlen(name)) == 0)
+			break ;
+		tmp = tmp->next;
+	}
+	free(tmp->value);
+	tmp->value = new_content;
+}
