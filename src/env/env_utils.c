@@ -124,3 +124,19 @@ void	print_var(char *name, t_env *env)
 	}
 	printf("NAME %s | Value %s\n", tmp->name, tmp->value);
 }
+
+int	find_var(char *name, t_env *env)
+{
+	t_env	*tmp;
+
+	tmp = env;
+	if (!name)
+		return (1);
+	while (tmp)
+	{
+		if (ft_strncmp(name, tmp->name, ft_strlen(name)) == 0)
+			return (0);
+		tmp = tmp->next;
+	}
+	return (1);
+}

@@ -29,8 +29,8 @@ static int	check_if_exist(char *name, t_env *env)
 	(void)env;
 	if (!name)
 		return (2);
-	/*if (!find_var(name, env))
-		return (1);*/
+	if (!find_var(name, env) == 0)
+		return (1);
 	return (0);
 }
 
@@ -48,7 +48,9 @@ static int	edit_or_add(char *arg, t_env *env)
 	if (exist == 1)
 		tmp->next = new_var(content[0], content[1]);
 	else if (exist == 0)
-		printf("update var\n");
+	{
+		update_var(content[0], content[1], env);
+	}
 	else 
 		return (1);
 	return (0);
