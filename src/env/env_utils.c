@@ -37,7 +37,7 @@ void	print_env(t_env *env)
 	}
 }
 
-char	*find_var(char *name, t_env *env)
+char	*get_var(char *name, t_env *env)
 {
 	t_env	*tmp;
 
@@ -50,6 +50,8 @@ char	*find_var(char *name, t_env *env)
 			break ;
 		tmp = tmp->next;
 	}
+	if (!tmp)
+		return (NULL);
 	return (tmp->value);
 }
 

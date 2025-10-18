@@ -1,6 +1,6 @@
 #include "../../includes/minishell.h"
 
-void	print_export(t_env *env)
+static void	print_export(t_env *env)
 {
 	char	*name;
 	char	*value;
@@ -16,7 +16,7 @@ void	print_export(t_env *env)
 		name = tmp->name;
 		value = tmp->value;
 		if (tmp->value)
-			printf("declare -x %s=%s\n", tmp->name, tmp->value);
+			printf("declare -x %s=\"%s\"\n", tmp->name, tmp->value);
 		else
 			printf("declare -x %s\n", tmp->name);
 		tmp = tmp->next;
@@ -24,10 +24,41 @@ void	print_export(t_env *env)
 	return ;
 }
 
-int	ft_export(char **str, t_env *env)
+static int	check_if_exist(char *name, t_env *env)
 {
-	if (!str[1])
+	(void)env;
+	if (!name)
+		return (2);
+	/*if (!find_var(name, env))
+		return (1);*/
+	return (0);
+}
+
+static int	edit_or_add(char *arg, t_env *env)
+{
+	t_env	*tmp;
+	char	**content;
+	int		exist;
+
+	tmp = env;
+	while (tmp->next)
+		tmp = tmp->next;
+	content = split_env(arg, '=');
+	exist = check_if_exist(content[0], env);
+	if (exist == 1)
+		tmp->next = new_var(content[0], content[1]);
+	else if (exist == 0)
+		printf("update var\n");
+	else 
+		return (1);
+	return (0);
+}
+
+int	ft_export(char **args, t_env *env)
+{
+	if (!args[1])
 		print_export(env);
-	printf("Dude\n");
+	else
+		edit_or_add(args[1], env);
 	return (0);
 }

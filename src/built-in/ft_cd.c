@@ -8,8 +8,8 @@ int	ft_cd(char	**args, t_env *env)
 
     if (!args[1] || ft_strncmp(args[1], "~", ft_strlen(args[1])) == 0)
     {
-		current_path = find_var("PWD", env);
-        new_path = find_var("HOME", env);
+		current_path = get_var("PWD", env);
+        new_path = get_var("HOME", env);
         if (!new_path)
             return (1); // Peut être afficher un msg ? et free old_path si il existe
 		update_var("OLDPWD", current_path, env);
@@ -18,10 +18,10 @@ int	ft_cd(char	**args, t_env *env)
     }
 	else if (ft_strncmp(args[1], "-", ft_strlen(args[1])) == 0)
 	{
-		new_path = find_var("OLDPWD", env);
+		new_path = get_var("OLDPWD", env);
 		if (!new_path)
 			return (1);
-		current_path = find_var("PWD", env);
+		current_path = get_var("PWD", env);
 		update_var("OLDPWD", current_path, env);
 		update_var("PWD", new_path, env);
 		if (chdir(new_path) == -1)
@@ -29,7 +29,7 @@ int	ft_cd(char	**args, t_env *env)
 	}
 	else
 	{
-		current_path = find_var("PWD", env);
+		current_path = get_var("PWD", env);
 		if (!current_path)
 			return (1);
 		update_var("OLDPWD", current_path, env);

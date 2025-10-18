@@ -225,7 +225,7 @@ static char	*find_command_in_path(char *cmd, t_env *env)
 	int		x;
 
 	x = 0;
-	value_path = find_var("PATH", env);
+	value_path = get_var("PATH", env);
 	if (!value_path)
 		return (NULL);
 	paths = ft_split(value_path, ':');
