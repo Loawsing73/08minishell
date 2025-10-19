@@ -37,7 +37,7 @@ static char	*extract_variable_input(char *s, int start_pos)
 	var_name[i] = '\0';
 	return (var_name);
 }
-
+/*
 static char	*find_within_env(char **env, char *var_name)
 {
 	int	i;
@@ -56,8 +56,9 @@ static char	*find_within_env(char **env, char *var_name)
 	}
 	return (NULL);
 }
+*/
 
-static int	expand_variable(char *s, char *d, int *i, int *j, char **env)
+static int	expand_variable(char *s, char *d, int *i, int *j, t_env *env)
 {
 	char	*var_name;
 	char	*var_value;
@@ -70,7 +71,7 @@ static int	expand_variable(char *s, char *d, int *i, int *j, char **env)
 	var_name = extract_variable_input(s, var_start);
 	if (var_name)
 	{
-		var_value = find_within_env(env, var_name);
+		var_value = find_var(var_name, env);
 		if (var_value)
 		{
 			k = -1;
@@ -91,7 +92,7 @@ static int	expand_variable(char *s, char *d, int *i, int *j, char **env)
 	return (0);
 }
 
-static void	filldquote(char *s, char *d, int *i, int *j, char **env)
+static void	filldquote(char *s, char *d, int *i, int *j, t_env *env)
 {
 	int	limit;
 
@@ -148,20 +149,18 @@ static void fillquote(char *s, char *d, int *i, int *j)
 	(*i)++;
 }
 
-static int	max_env(char **env, char *s)
+static int	max_env(t_env *env, char *s)
 {
-	int	i;
 	int	max;
 
-	i = 0;
 	max = 0;
-	if (!env || !env[i])
+	if (!env)
 		return (ft_strlen(s));
-	while (env[i])
+	while (env)
 	{
-		if (max < ft_strlen(env[i]))
-			max = ft_strlen(env[i]);
-		i++;
+		if (max < ft_strlen(env->value))
+			max = ft_strlen(env->value);
+		env = env->next;
 	}
 	return (max + 100);
 }
@@ -207,7 +206,7 @@ static int	consecutive_angbra(char *s, int i)
 }
 /*fonction principale de parsing:
 */
-char	*concate_hell(char *s, char **env)
+char	*concate_hell(char *s, t_env *env)
 {
 	int i;
 	int j;

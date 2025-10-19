@@ -22,8 +22,12 @@ SRCS = src/main.c \
 	   src/lib/strrchr.c \
 	   src/lib/strtrim.c \
 	   src/lib/substr.c \
+	   src/lib/split_env.c \
 	   src/built-in/echo.c \
-	   src/exec/execute_ast.c
+	   src/exec/execute_ast.c \
+	   src/env/env_utils.c \
+	   src/env/create_env.c \
+	   src/ft_free/ft_free.c
 
 
 OBJS = $(SRCS:.c=.o)
