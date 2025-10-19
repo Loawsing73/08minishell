@@ -48,9 +48,7 @@ static int	edit_or_add(char *arg, t_env *env)
 	if (exist == 1)
 		tmp->next = new_var(content[0], content[1]);
 	else if (exist == 0)
-	{
 		update_var(content[0], content[1], env);
-	}
 	else 
 		return (1);
 	return (0);
