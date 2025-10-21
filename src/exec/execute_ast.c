@@ -1,4 +1,5 @@
 #include "../../includes/minishell.h"
+
 /*si input "." => msg d'erreur spécial dans bash*/
 static void	exeute_errors_specific(char **arg)
 {
@@ -108,7 +109,7 @@ static int handle_heredoc(char *delimiter)
 		line = readline("> ");
 		if (!line)
 			break ;
-		if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0)
+		else if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0)
 		{
 			free(line);
 			break ;
@@ -443,7 +444,7 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 		if (prev_pipe[0] != -1)
 		{
 			close(prev_pipe[0]);
-			if (prev_pipe[1] != -1)  // ✅ Vérifier avant de fermer
+			if (prev_pipe[1] != -1)
         		close(prev_pipe[1]);
 		}
 		if (i < pipeline->child_count - 1)

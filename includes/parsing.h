@@ -1,6 +1,7 @@
 #ifndef PARSING_H
 # define PARSING_H
 
+# include "env.h"
 typedef enum e_token
 {
         WORD = 0,
@@ -100,7 +101,7 @@ t_lexem *parsing_input(t_cursor *cursor, char *input);
 void	free_lexem_list(t_lexem *head);
 
 //trim_expand.c
-char	*concate_hell(char *s, char **env);
+char	*concate_hell(char *s, t_env *env);
 
 //valid.c
 int	valid_input(char *input);

@@ -2,7 +2,7 @@
 
 int main(int ac, char **ag, char **env)
 {
-	char *input;
+	char *input = NULL;
 	char *joined;
 	t_lexem *head;
 	t_env	*new_env;
@@ -15,22 +15,19 @@ int main(int ac, char **ag, char **env)
 	while (1)
 	{
 		input = readline("minishell >> ");
-		if (!input)
-		{
-			clear_history();
-			return (1);
-		}
-		if (ft_strncmp(input, "exit", 4) == 0)
+		if (*input == '\0')
+			continue ;
+		if (ft_strncmp(input, "exit", ft_strlen(input)) == 0)
 		{
 			add_history(input);
 			free(input);
 			break;
 		}
-		if (*input)
+		if (input)
 			add_history(input);
 		if (valid_input(ft_strtrim(input, " ")))
 		{
-			joined = concate_hell(input, env);
+			joined = concate_hell(input, new_env);
 			// clean_neg_ascii(joined);
 			//printf("%s\n", joined);
 			head = parsing_input(&cursor, joined);

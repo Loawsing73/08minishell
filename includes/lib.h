@@ -15,5 +15,6 @@ int                     ft_isalnum(int c);
 void            *ft_memcpy(void *restrict dst, const void *restrict src, size_t n);
 void            *my_realloc(void *ptr, size_t old_size, size_t new_size);
 void            ft_strncpy(char *s, char *d, int size);
+char	        **split_env(char *str, char c);
 
 #endif
