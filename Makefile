@@ -24,9 +24,11 @@ SRCS = src/main.c \
 	   src/lib/substr.c \
 	   src/lib/split_env.c \
 	   src/built-in/echo.c \
+	   src/built-in/ft_cd.c \
+	   src/built-in/ft_export.c \
 	   src/exec/execute_ast.c \
-	   src/env/env_utils.c \
 	   src/env/create_env.c \
+	   src/env/env_utils.c \
 	   src/ft_free/ft_free.c
 
 

@@ -12,7 +12,6 @@ int main(int ac, char **ag, char **env)
 	(void)ac;
 	(void)ag;
 	new_env = create_env(env);
-	//print_env(new_env);
 	while (1)
 	{
 		input = readline("minishell >> ");
@@ -41,7 +40,7 @@ int main(int ac, char **ag, char **env)
 			t_ast_node *ast = parse(head);
 			if (ast)
 			{
-				//print_ast(ast, 0);
+				//      print_ast(ast, 0);
 				execute_ast(ast, new_env);
 				free_ast(ast);
 			}

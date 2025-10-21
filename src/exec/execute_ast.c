@@ -30,17 +30,22 @@ int is_builtins(char *cmd)
 {
 	if (ft_strncmp(cmd, "echo", ft_strlen("echo")) == 0)
 		return (1);
+	if (ft_strncmp(cmd, "cd", ft_strlen(cmd)) == 0)
+		return (2);
+	if (ft_strncmp(cmd, "export", ft_strlen(cmd)) == 0)
+		return (4);
 	return (0);
 }
+
 /*execute le builtin en fonction du code renvoyé*/
 void    execute_builtins(char **args, t_env *env, int code)
 {
-	(void)env;
 	if (code == 1)
-	{   
 		ft_echo(args);
-		return ;
-	}
+    else if (code == 2)
+        ft_cd(args, env);
+	else if (code == 4)
+		ft_export(args, env);
 } 
 static int has_heredocs(t_ast_node *pipeline)
 {
@@ -212,53 +217,48 @@ static void handle_redirections(t_ast_node *redirection_node)
 	}
 }
 
-static char *find_command_in_path(char *cmd, t_env *env)
+static char	*find_command_in_path(char *cmd, t_env *env)
 {
-	char	*path_env;
-	char	**paths;
+	char	*value_path;
+	char	*tmp;
 	char	*full_path;
-	char	*temp;
-	int		i;
+	char	**paths;
+	int		x;
 
-	if (!cmd || ft_strchr(cmd, '/'))
-		return (cmd);
-	path_env = NULL;
-	path_env = find_var("PATH", env);
-	if (!path_env)
-		return (cmd);
-	paths = ft_split(path_env, ':');
-	i = 0;
-	while (paths[i])
+	x = 0;
+	value_path = get_var("PATH", env);
+	if (!value_path)
+		return (NULL);
+	paths = ft_split(value_path, ':');
+	if (!paths)
+		return (free(value_path), NULL);
+	while (paths[x])
 	{
-		temp = ft_strjoin(paths[i], "/");
-		full_path = ft_strjoin(temp, cmd);
-		free(temp);
+		tmp = ft_strjoin(paths[x], "/");
+		full_path = ft_strjoin(tmp, cmd);
+		free(tmp);
 		if (access(full_path, X_OK) == 0)
 		{
-			i = 0;
-			while (paths[i])
-				free(paths[i++]);
-			free(paths);
+			free_tab(paths);
 			return (full_path);
 		}
 		free(full_path);
-		i++;
+		x++;
 	}
-	i = 0;
-	while (paths[i])
-		free(paths[i++]);
-	free(paths);
+	free_tab(paths);
 	return (cmd);
 }
+
+static void execute_command(t_ast_node *command, t_env *env)
 /*si word = args[0]
 si argument, remplit args[i]
 puis regarde args[0], regarde si cas spécifique (.) 
 puis regarde si c'est builtin*/
-static void execute_command(t_ast_node *command, t_env *env)
 {
 	char    *cmd_name;
 	char    *cmd_path;
 	char    **args;
+	char	**tab_env;
 	int     i;
 	int     j;
 	int     arg_count;
@@ -309,7 +309,10 @@ static void execute_command(t_ast_node *command, t_env *env)
 	else
 	{
 		cmd_path = find_command_in_path(cmd_name, env);
-		execve(cmd_path, args, convert_env_to_tab(env));
+		tab_env = convert_env_to_tab(env);
+		if (!tab_env)
+			return ;
+		execve(cmd_path, args, tab_env);
 		perror("execve");
 		if (cmd_path != cmd_name)
 			free(cmd_path);
@@ -318,7 +321,7 @@ static void execute_command(t_ast_node *command, t_env *env)
 	exit(1);
 }
 
-static void execute_pipeline(t_ast_node *pipeline, t_env *env)
+static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 {
 	int			i;
 	int			prev_pipe[2];
@@ -383,7 +386,7 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *env)
 			i++;
 		}
 		args[j] = NULL;
-		execute_builtins(args, env, is_builtins(cmd_name));
+		execute_builtins(args, new_env, is_builtins(cmd_name));
 		free(args);
 		return ;
 	}
@@ -431,11 +434,11 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *env)
 			}
 			cleanup_heredoc_pipes(heredoc_pipes, pipeline->child_count);
 			if (command->type == NODE_PIPELINE)
-        		execute_pipeline(command, env);
+        		execute_pipeline(command, new_env);  // Récursif
     		else if (command->type == NODE_COMMAND)
-				execute_command(command, env);
-			else
-        		exit(1);
+        		execute_command(command, new_env);
+    		else
+				exit(1);
 			exit(0);
 		}
 		if (prev_pipe[0] != -1)

@@ -37,7 +37,7 @@ void	print_env(t_env *env)
 	}
 }
 
-char	*find_var(char *name, t_env *env)
+char	*get_var(char *name, t_env *env)
 {
 	t_env	*tmp;
 
@@ -50,6 +50,8 @@ char	*find_var(char *name, t_env *env)
 			break ;
 		tmp = tmp->next;
 	}
+	if (!tmp)
+		return (NULL);
 	return (tmp->value);
 }
 
@@ -106,7 +108,6 @@ void	update_var(char *name, char *new_content, t_env *env)
 			break ;
 		tmp = tmp->next;
 	}
-	free(tmp->value);
 	tmp->value = new_content;
 }
 
@@ -122,4 +123,20 @@ void	print_var(char *name, t_env *env)
 		tmp = tmp->next;
 	}
 	printf("NAME %s | Value %s\n", tmp->name, tmp->value);
+}
+
+int	find_var(char *name, t_env *env)
+{
+	t_env	*tmp;
+
+	tmp = env;
+	if (!name)
+		return (1);
+	while (tmp)
+	{
+		if (ft_strncmp(name, tmp->name, ft_strlen(name)) == 0)
+			return (0);
+		tmp = tmp->next;
+	}
+	return (1);
 }

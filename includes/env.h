@@ -25,11 +25,12 @@ typedef struct s_env{
 //env_utils.c
 t_env	*new_var(char *name, char *value);
 void	print_env(t_env *env);
-char	*find_var(char *name, t_env *env);
+char	*get_var(char *name, t_env *env);
 int		get_size_env(t_env *env);
 char	**convert_env_to_tab(t_env *env);
 void	update_var(char *name, char *new_content, t_env *env);
 void	print_var(char *name, t_env *env);
+int	find_var(char *name, t_env *env);
 
 //create_env.c
 t_env	*create_env(char **env);
