@@ -1,4 +1,5 @@
 #include "../../includes/minishell.h"
+
 /*si input "." => msg d'erreur spécial dans bash*/
 static void	exeute_errors_specific(char **arg)
 {
@@ -103,7 +104,7 @@ static int handle_heredoc(char *delimiter)
 		line = readline("> ");
 		if (!line)
 			break ;
-		if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0)
+		else if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0)
 		{
 			free(line);
 			break ;

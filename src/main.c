@@ -18,7 +18,7 @@ int main(int ac, char **ag, char **env)
 		input = readline("minishell >> ");
 		if (*input == '\0')
 			continue ;
-		if (ft_strncmp(input, "exit", 4) == 0)
+		if (ft_strncmp(input, "exit", ft_strlen(input)) == 0)
 		{
 			add_history(input);
 			free(input);
@@ -28,7 +28,6 @@ int main(int ac, char **ag, char **env)
 			add_history(input);
 		if (valid_input(ft_strtrim(input, " ")))
 		{
-			write(1, "c", 1);
 			joined = concate_hell(input, new_env);
 			// clean_neg_ascii(joined);
 			//printf("%s\n", joined);
@@ -42,7 +41,7 @@ int main(int ac, char **ag, char **env)
 			t_ast_node *ast = parse(head);
 			if (ast)
 			{
-				//      print_ast(ast, 0);
+				//print_ast(ast, 0);
 				execute_ast(ast, new_env);
 				free_ast(ast);
 			}

@@ -1,9 +1,29 @@
 #include "../../includes/minishell.h"
 
+static int	is_valid_delimiter(char *s)
+{
+	int	i;
+
+	i = get_index(0, s, '<');
+	if (i >= 0)
+	{
+		if (s[++i] == '<')
+		{
+			i++;
+			while (s[i] == ' ')
+				i++;
+			if (s[i] == '>' || s[i] == '<' || s[i] == '|')
+				return (0);
+		}
+	}
+	return (1);
+}
 /*s'assure qu'input finit ou commence pas par |*/
-static int	pipe_end_beg(char *s)
+static int	operator_end_beg(char *s)
 {
 	if (s[0] == '|' || s[ft_strlen(s)-1] == '|')
+		return (0);
+	if (s[ft_strlen(s)-1] == '<' || s[ft_strlen(s)-1] == '>')
 		return (0);
 	return (1);
 }
@@ -123,6 +143,6 @@ int	valid_input(char *input)
 		else
 			i++;
 	}
-	return (special_caract(input) * quote * dquote * pipe_end_beg(input)
-		* triple_angbra(input) * far_angbra(input));
+	return (special_caract(input) * quote * dquote * operator_end_beg(input)
+		* triple_angbra(input) * far_angbra(input) * is_valid_delimiter(input));
 }
