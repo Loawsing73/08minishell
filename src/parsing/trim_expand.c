@@ -71,7 +71,7 @@ static int	expand_variable(char *s, char *d, int *i, int *j, t_env *env)
 	var_name = extract_variable_input(s, var_start);
 	if (var_name)
 	{
-		var_value = find_var(var_name, env);
+		var_value = get_var(var_name, env);
 		if (var_value)
 		{
 			k = -1;
