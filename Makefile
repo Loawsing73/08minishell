@@ -28,6 +28,7 @@ SRCS = src/main.c \
 	   src/built-in/ft_export.c \
 	   src/built-in/ft_pwd.c \
 	   src/built-in/unset.c \
+	   src/built-in/ft_env.c \
 	   src/exec/execute_ast.c \
 	   src/env/create_env.c \
 	   src/env/env_utils.c \
