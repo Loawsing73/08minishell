@@ -6,5 +6,6 @@
 void 	ft_echo(char **args);
 int		ft_cd(char **args, t_env *env);
 int		ft_export(char **args, t_env *env);
+int	ft_pwd(t_env *env);
 
 #endif
