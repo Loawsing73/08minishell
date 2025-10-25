@@ -36,6 +36,8 @@ int is_builtins(char *cmd)
 		return (4);
 	if (ft_strncmp(cmd, "pwd", ft_strlen(cmd)) == 0)
 		return (3);
+	if (ft_strncmp(cmd, "unset", ft_strlen(cmd)) == 0)
+		return (5);
 	return (0);
 }
 
@@ -50,6 +52,8 @@ void    execute_builtins(char **args, t_env *env, int code)
 		ft_export(args, env);
 	else if (code == 3)
 		ft_pwd(env);
+	else if (code == 5)
+		ft_unset(args, env);
 } 
 static int has_heredocs(t_ast_node *pipeline)
 {

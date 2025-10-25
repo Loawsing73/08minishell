@@ -140,3 +140,26 @@ int	find_var(char *name, t_env *env)
 	}
 	return (1);
 }
+
+int delete_var(char *name, t_env *env)
+{
+	t_env *tmp;
+	t_env *last;
+
+	tmp = env;
+	while (tmp)
+	{
+		if (ft_strncmp(name, tmp->name, ft_strlen(name)) == 0)
+		{
+			last->next = tmp->next;
+			free(tmp->name);
+			free(tmp->value);
+			free(tmp);
+			return (0);
+		}
+		last = tmp;
+		tmp = tmp->next;
+	}
+	return (1);
+}
+
