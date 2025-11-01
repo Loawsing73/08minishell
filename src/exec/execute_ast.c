@@ -265,7 +265,7 @@ static char	*find_command_in_path(char *cmd, t_env *env)
 	return (cmd);
 }
 
-static void execute_command(t_ast_node *command, t_env *env)
+static void execute_command(t_global *global)
 /*si word = args[0]
 si argument, remplit args[i]
 puis regarde args[0], regarde si cas spécifique (.) 
@@ -284,26 +284,26 @@ puis regarde si c'est builtin*/
 	args = NULL;
 	arg_count = 0;
 	i = 0;
-	while (i < command->child_count)
+	while (i < global->tree->child_count)
 	{
-		if (command->children[i]->type == NODE_WORD)
-			cmd_name = command->children[i]->value;
-		else if (command->children[i]->type == NODE_ARGUMENT)
-			arg_count = command->children[i]->child_count;
+		if (global->tree->children[i]->type == NODE_WORD)
+			cmd_name = global->tree->children[i]->value;
+		else if (global->tree->children[i]->type == NODE_ARGUMENT)
+			arg_count = global->tree->children[i]->child_count;
 		i++;
 	}
 	args = malloc(sizeof(char *) * (arg_count + 2));
 	args[0] = cmd_name;
 	j = 1;
 	i = 0;
-	while (i < command->child_count)
+	while (i < global->tree->child_count)
 	{
-		if (command->children[i]->type == NODE_ARGUMENT)
+		if (global->tree->children[i]->type == NODE_ARGUMENT)
 		{
 			int k = 0;
-			while (k < command->children[i]->child_count)
+			while (k < global->tree->children[i]->child_count)
 			{
-				args[j] = command->children[i]->children[k]->value;
+				args[j] = global->tree->children[i]->children[k]->value;
 				j++;
 				k++;
 			}
@@ -312,20 +312,20 @@ puis regarde si c'est builtin*/
 	}
 	args[j] = NULL;
 	i = 0;
-	while (i < command->child_count)
+	while (i < global->tree->child_count)
 	{
-    	if (command->children[i]->type == NODE_REDIRECTION)
-        	handle_redirections(command->children[i]);
+    	if (global->tree->children[i]->type == NODE_REDIRECTION)
+        	handle_redirections(global->tree->children[i]);
     	i++;
 	}
 	if (is_specific_cmd(args))
 		exeute_errors_specific(args);
 	else if (is_builtins(cmd_name))
-		execute_builtins(args, env, is_builtins(cmd_name));
+		execute_builtins(args, global->env, is_builtins(cmd_name));
 	else
 	{
-		cmd_path = find_command_in_path(cmd_name, env);
-		tab_env = convert_env_to_tab(env);
+		cmd_path = find_command_in_path(cmd_name, global->env);
+		tab_env = convert_env_to_tab(global->env);
 		if (!tab_env)
 			return ;
 		execve(cmd_path, args, tab_env);
@@ -337,7 +337,7 @@ puis regarde si c'est builtin*/
 	exit(1);
 }
 
-static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
+static void execute_pipeline(t_global *global)
 {
 	int			i;
 	int			prev_pipe[2];
@@ -352,9 +352,9 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 	int			j;
 
 	is_single_builtin = 0;
-	if (pipeline->child_count == 1)
+	if (global->tree->child_count == 1)
 	{
-		command = pipeline->children[0];
+		command = global->tree->children[0];
 		cmd_name = NULL;
 		i = 0;
 		while (i < command->child_count)
@@ -373,7 +373,7 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 	{
 		arg_count = 0;
 		j = 1;
-		command = pipeline->children[0];
+		command = global->tree->children[0];
 		cmd_name = NULL;
 		i = 0;
 		while (i < command->child_count)
@@ -402,12 +402,12 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 			i++;
 		}
 		args[j] = NULL;
-		execute_builtins(args, new_env, is_builtins(cmd_name));
+		execute_builtins(args, global->env, is_builtins(cmd_name));
 		free(args);
 		return ;
 	}
-	heredoc_pipes = prepare_all_heredocs(pipeline);
-	if (!heredoc_pipes && has_heredocs(pipeline))
+	heredoc_pipes = prepare_all_heredocs(global->tree);
+	if (!heredoc_pipes && has_heredocs(global->tree))
 	{
 		perror("heredoc preparation failed");
 		return ;
@@ -415,15 +415,15 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 	prev_pipe[0] = -1;
 	prev_pipe[1] = -1;
 	i = 0;
-	while (i < pipeline->child_count)
+	while (i < global->tree->child_count)
 	{
-		command = pipeline->children[i];
-		if (i < pipeline->child_count - 1)
+		command = global->tree->children[i];
+		if (i < global->tree->child_count - 1)
 		{
 			if (pipe(curr_pipe) == -1)
 			{
 				perror("pipe");
-				cleanup_heredoc_pipes(heredoc_pipes, pipeline->child_count);
+				cleanup_heredoc_pipes(heredoc_pipes, global->tree->child_count);
 				return ;
 			}
 		}
@@ -442,17 +442,17 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 				close(prev_pipe[0]);
 				close(prev_pipe[1]);
 			}
-			if (i < pipeline->child_count - 1)
+			if (i < global->tree->child_count - 1)
 			{
 				close(curr_pipe[0]);
 				dup2(curr_pipe[1], STDOUT_FILENO);
 				close(curr_pipe[1]);
 			}
-			cleanup_heredoc_pipes(heredoc_pipes, pipeline->child_count);
+			cleanup_heredoc_pipes(heredoc_pipes, global->tree->child_count);
 			if (command->type == NODE_PIPELINE)
-        		execute_pipeline(command, new_env);  // Récursif
+        		execute_pipeline(command, global->env);  // Récursif
     		else if (command->type == NODE_COMMAND)
-        		execute_command(command, new_env);
+        		execute_command(command, global->env);
     		else
 				exit(1);
 			exit(0);
@@ -463,7 +463,7 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 			if (prev_pipe[1] != -1)
         		close(prev_pipe[1]);
 		}
-		if (i < pipeline->child_count - 1)
+		if (i < global->tree->child_count - 1)
 		{
 			close(curr_pipe[1]);
 			prev_pipe[0] = curr_pipe[0];
@@ -471,9 +471,9 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 		}
 		i++;
 	}
-	cleanup_heredoc_pipes(heredoc_pipes, pipeline->child_count);
+	cleanup_heredoc_pipes(heredoc_pipes, global->tree->child_count);
 	i = 0;
-	while (i < pipeline->child_count)
+	while (i < global->tree->child_count)
 	{
 		wait(NULL);
 		i++;
@@ -482,10 +482,10 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 
 void execute_ast(t_global *global)
 {
-	if (!node)
+	if (!global->tree)
 		return ;
-	if (node->type == NODE_PIPELINE)
-		execute_pipeline(node, env);
+	if (global->tree->type == NODE_PIPELINE)
+		execute_pipeline(global);
 	else if (node->type == NODE_COMMAND)
 		execute_command(node, env);
 }
