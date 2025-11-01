@@ -17,12 +17,12 @@ int main(int ac, char **ag, char **env)
 		input = readline("minishell >> ");
 		if (*input == '\0')
 			continue ;
-		if (ft_strncmp(input, "exit", ft_strlen(input)) == 0)
+		/*if (ft_strncmp(input, "exit", ft_strlen(input)) == 0)
 		{
 			add_history(input);
 			free(input);
 			break;
-		}
+		}*/
 		if (input)
 			add_history(input);
 		if (valid_input(ft_strtrim(input, " ")))

@@ -12,6 +12,8 @@ char			**split_env(char *str, char c);
 int                     ft_strlen(char *s);
 int                     ft_strncmp(char *s1, char *s2, int n);
 int                     ft_isalnum(int c);
+int				ft_atoi(const char *nptr);
+int				ft_isdigit(int c);
 void            *ft_memcpy(void *restrict dst, const void *restrict src, size_t n);
 void            *my_realloc(void *ptr, size_t old_size, size_t new_size);
 void            ft_strncpy(char *s, char *d, int size);

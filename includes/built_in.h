@@ -4,6 +4,7 @@
 #include "env.h"
 
 void 	ft_echo(char **args);
+void	ft_exit_bul(char **args, t_env *env);
 int		ft_cd(char **args, t_env *env);
 int		ft_export(char **args, t_env *env);
 int	ft_pwd(t_env *env);

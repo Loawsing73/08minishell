@@ -40,6 +40,8 @@ int is_builtins(char *cmd)
 		return (5);
 	if (ft_strncmp(cmd, "env", ft_strlen(cmd)) == 0)
 		return (6);
+	if (ft_strncmp(cmd, "exit", ft_strlen(cmd)) == 0)
+		return (7);
 	return (0);
 }
 
@@ -58,6 +60,8 @@ void    execute_builtins(char **args, t_env *env, int code)
 		ft_unset(args, env);
 	else if (code == 6)
 		ft_env(env);
+	else if (code == 7)
+		ft_exit_bul(args, env);
 } 
 static int has_heredocs(t_ast_node *pipeline)
 {
