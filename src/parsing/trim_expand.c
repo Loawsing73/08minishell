@@ -1,8 +1,6 @@
 #include "../../includes/minishell.h"
 
 //gardera index a jour 
-//#include "../INCLUDES/token.h"
-
 static int	skip_variable(char *s, int i)
 {
 	while (s[i] && (ft_isalnum(s[i]) || s[i] == '_'))
