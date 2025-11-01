@@ -51,7 +51,7 @@ static int	check_if_exist(char *name, t_env *env)
 	(void)env;
 	if (!name)
 		return (2);
-	if (!find_var(name, env) == 0)
+	if (find_var(name, env) == 0)
 		return (1);
 	return (0);
 }

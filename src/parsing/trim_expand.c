@@ -1,8 +1,6 @@
 #include "../../includes/minishell.h"
 
 //gardera index a jour 
-//#include "../INCLUDES/token.h"
-
 static int	skip_variable(char *s, int i)
 {
 	while (s[i] && (ft_isalnum(s[i]) || s[i] == '_'))
@@ -206,7 +204,7 @@ static int	consecutive_angbra(char *s, int i)
 }
 /*fonction principale de parsing:
 */
-char	*concate_hell(char *s, t_env *env)
+char	*concate_hell(char *expanded_input, t_global *global)
 {
 	int i;
 	int j;
@@ -214,30 +212,30 @@ char	*concate_hell(char *s, t_env *env)
 	
 	i = 0;
 	j = 0;
-	stash = malloc(sizeof(char) * max_env(env, s));
+	stash = malloc(sizeof(char) * max_env(global->env, expanded_input));
 	if (!stash)
 		return (NULL);
-	while (s[i])
+	while (expanded_input[i])
 	{
-		if ((s[i] == '<' || s[i] == '>') && consecutive_angbra(s, i))
-			expand_heredoc(s, stash, &i, &j);
-		else if (s[i] == '\'' || s[i] == '"')
+		if ((expanded_input[i] == '<' || expanded_input[i] == '>') && consecutive_angbra(expanded_input, i))
+			expand_heredoc(expanded_input, stash, &i, &j);
+		else if (expanded_input[i] == '\'' || expanded_input[i] == '"')
 		{
-			if (s[i] == '\'')
-				fillquote(s, stash, &i, &j);
-			else if (s[i] == '"')
-				filldquote(s, stash, &i, &j, env);
+			if (expanded_input[i] == '\'')
+				fillquote(expanded_input, stash, &i, &j);
+			else if (expanded_input[i] == '"')
+				filldquote(expanded_input, stash, &i, &j, global->env);
 		}
-		else if (s[i] == '$' && !consecutive_dollar(s, i))
+		else if (expanded_input[i] == '$' && !consecutive_dollar(expanded_input, i))
 		{
-			if (!expand_variable(s, stash, &i, &j, env))
-				fill(s, stash, &i, &j);
+			if (!expand_variable(expanded_input, stash, &i, &j, global->env))
+				fill(expanded_input, stash, &i, &j);
 		}
 		else
 		{
-        	if (s[i] == '$' && consecutive_dollar(s, i))
-            	fill(s, stash, &i, &j);
-        	fill(s, stash, &i, &j);
+        	if (expanded_input[i] == '$' && consecutive_dollar(expanded_input, i))
+            	fill(expanded_input, stash, &i, &j);
+        	fill(expanded_input, stash, &i, &j);
 		}
     }
 	stash[j] = '\0';

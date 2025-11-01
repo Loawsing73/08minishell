@@ -17,4 +17,13 @@
 # include "env.h"
 # include "ft_free.h"
 
+typedef struct s_global
+{
+    t_env    *env;
+    char    *input;
+    t_cursor cursor;
+    t_lexem     *head;
+    t_ast_node  *tree;  
+}   t_global;
+
 #endif

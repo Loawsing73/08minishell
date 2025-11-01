@@ -333,11 +333,11 @@ t_ast_node	*parse_word(t_parser *parser)
 }
 
 // Fonction principale de parsing
-t_ast_node	*parse(t_lexem *lexem)
+t_ast_node	*parse(t_global *global)
 {
 	t_parser	parser;
 
-	parser.current = lexem;
+	parser.current = global->lexem;
 	parser.root = NULL;
 	parser.root = parse_pipeline(&parser);
 	return (parser.root);
