@@ -82,7 +82,7 @@ t_ast_node	*parse_argument(t_parser *parser);
 t_ast_node	*parse_redirection_list(t_parser *parser);
 t_ast_node	*parse_redirection(t_parser *parser);
 t_ast_node	*parse_word(t_parser *parser);
-t_ast_node	*parse(t_lexem *lexem);
+t_ast_node	*parse(t_global *global);
 
 //rendering.c
 void print_ast(t_ast_node *node, int indent);
@@ -97,11 +97,11 @@ int	get_space(int position, char *s);
 t_token	get_token(char c);
 void	switch_token(t_token token, t_cursor *cursor);
 t_lexem	*create_node(t_lexem *head, t_token token, char *input);
-t_lexem *parsing_input(t_cursor *cursor, char *input);
-void	free_lexem_list(t_lexem *head);
+t_lexem *parsing_input(t_global *global);
+void	free_lexem_list(t_global *global);
 
 //trim_expand.c
-char	*concate_hell(char *s, t_env *env);
+char	*concate_hell(char *expanded_input, t_global *global);
 
 //valid.c
 int	valid_input(char *input);

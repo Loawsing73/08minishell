@@ -3,6 +3,6 @@
 
 #include "minishell.h"
 
-void	execute_ast(t_ast_node *node, t_env *new_env);
+void	execute_ast(t_global *global);
 
 #endif

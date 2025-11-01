@@ -476,7 +476,7 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 	}
 }
 
-void execute_ast(t_ast_node *node, t_env *env)
+void execute_ast(t_global *global)
 {
 	if (!node)
 		return ;

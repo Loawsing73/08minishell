@@ -165,33 +165,31 @@ tant que espace, avance
 si |, crée node PIPE
 si <, <<, >, >> crée node correpondant
 else c'est un word*/
-t_lexem *parsing_input(t_cursor *cursor, char *input)
+t_lexem *parsing_input(t_global *global)
 {
-	t_lexem	*head;
-
-	cursor->input = ft_strdup(input);
-	cursor->position = 0;
-	cursor->previous = ERROR;
-	cursor->current = ERROR;
-	head = NULL;
-	while (cursor->input[cursor->position])
+	global->cursor->input = ft_strdup(global.input); //free global.iput
+	global->cursor->position = 0;
+	global->cursor->previous = ERROR;
+	global->cursor->current = ERROR;
+	global->head = NULL;
+	while (global->cursor->input[global->cursor->position])
 	{
-		while (cursor->input[cursor->position] == '\t'
-			|| cursor->input[cursor->position] == ' ')
-			cursor->position++;
-		if (cursor->input[cursor->position] == '|')
-			cursor->position += is_pipe(&head, cursor);
-		else if (cursor->input[cursor->position] == '>')
-			cursor->position += is_great(&head, cursor);
-		else if (cursor->input[cursor->position] == '<')
-			cursor->position += is_less(&head, cursor);
+		while (global->cursor->input[global->cursor->position] == '\t'
+			|| global->cursor->input[global->cursor->position] == ' ')
+			global->cursor->position++;
+		if (global->cursor->input[global->cursor->position] == '|')
+			global->cursor->position += is_pipe(global);
+		else if (global->cursor->input[global->cursor->position] == '>')
+			global->cursor->position += is_great(global);
+		else if (global->cursor->input[global->cursor->position] == '<')
+			global->cursor->position += is_less(global);
 		else
-			cursor->position += is_word(&head, cursor);
+			global->cursor->position += is_word(global);
 	}
-	return (head);
+	return (global->head);
 }
 
-void	free_lexem_list(t_lexem *head)
+void	free_lexem_list(t_global *global)
 {
 	t_lexem	*current;
 	t_lexem	*next;
