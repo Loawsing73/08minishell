@@ -30,6 +30,7 @@ int		get_size_env(t_env *env);
 char	**convert_env_to_tab(t_env *env);
 void	update_var(char *name, char *new_content, t_env *env);
 void	print_var(char *name, t_env *env);
+void	swap_var(t_env *var1, t_env *var2);
 int	find_var(char *name, t_env *env);
 int	delete_var(char *name, t_env *env);
 

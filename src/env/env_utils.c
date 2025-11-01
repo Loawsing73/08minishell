@@ -163,3 +163,15 @@ int delete_var(char *name, t_env *env)
 	return (1);
 }
 
+void	swap_var(t_env *var1, t_env *var2)
+{
+	char *tmp_name;
+	char *tmp_value;
+
+	tmp_name = var1->name;
+	tmp_value = var1->value;
+	var1->name = var2->name;
+	var1->value = var2->value;
+	var2->name = tmp_name;
+	var2->value = tmp_value;
+}

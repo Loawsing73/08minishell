@@ -1,27 +1,49 @@
 #include "../../includes/minishell.h"
 
-static void	print_export(t_env *env)
-{
-	char	*name;
-	char	*value;
-	t_env *tmp;
 
-	(void)value;
-	(void)name;
+static void bubble_sort_env(t_env *env)
+{
+	t_env *tmp;
+	size_t	len1;
+	size_t	len2;
+	int		cmp;
+
 	tmp = env;
-	name = NULL;
-	value = NULL;
 	while (tmp)
 	{
-		name = tmp->name;
-		value = tmp->value;
+		if (tmp->next)
+		{
+			len1 = ft_strlen(tmp->name);
+			len2 = ft_strlen(tmp->next->name);
+			if (len1 >= len2)
+				cmp = ft_strncmp(tmp->name, tmp->next->name, len1);
+			else
+				cmp = ft_strncmp(tmp->name, tmp->next->name, len2);
+			if (cmp > 0)
+			{
+				swap_var(tmp, tmp->next);
+				tmp = env;
+			}
+		}
+		tmp = tmp->next;
+	}
+}
+
+
+static void	print_export(t_env *env)
+{
+	t_env *tmp;
+
+	tmp = env;
+	bubble_sort_env(tmp);
+	while (tmp)
+	{
 		if (tmp->value)
 			printf("declare -x %s=\"%s\"\n", tmp->name, tmp->value);
 		else
 			printf("declare -x %s\n", tmp->name);
 		tmp = tmp->next;
 	}
-	return ;
 }
 
 static int	check_if_exist(char *name, t_env *env)
