@@ -62,4 +62,8 @@ fclean: clean
 
 re: fclean all
 
-.PHONY = all clean fclean re
+dev: re
+	@./minishell
+	@make fclean
+
+.PHONY = all clean fclean re dev
