@@ -339,8 +339,11 @@ puis regarde si c'est builtin*/
 
 static void execute_pipeline(t_global *global)
 {
+	t_pipeline	data;
 	int			i;
-	int			prev_pipe[2];
+	int			j;
+	int			k;
+	/*int			prev_pipe[2];
 	int			curr_pipe[2];
 	pid_t		pid;
 	t_ast_node	*command;
@@ -348,93 +351,92 @@ static void execute_pipeline(t_global *global)
 	char		*cmd_name;
 	int			is_single_builtin;
 	char		**args;
-	int			arg_count;
-	int			j;
+	int			arg_count;*/
 
-	is_single_builtin = 0;
+	data.is_single_builtin = 0;
 	if (global->tree->child_count == 1)
 	{
-		command = global->tree->children[0];
-		cmd_name = NULL;
-		i = 0;
-		while (i < command->child_count)
+		data.command = global->tree->children[0];
+		data.cmd_name = NULL;
+		data.i = 0;
+		while (data.i < data.command->child_count)
 		{
-			if (command->children[i]->type == NODE_WORD)
+			if (data.command->children[i]->type == NODE_WORD)
 			{
-				cmd_name = command->children[i]->value;
+				data.cmd_name = data.command->children[i]->value;
 				break ;
 			}
-			i++;
+			data.i++;
 		}
-		if (cmd_name && is_builtins(cmd_name))
-			is_single_builtin = 1;
+		if (data.cmd_name && is_builtins(data.cmd_name))
+			data.is_single_builtin = 1;
 	}
-	if (is_single_builtin)
+	if (data.is_single_builtin)
 	{
-		arg_count = 0;
-		j = 1;
-		command = global->tree->children[0];
-		cmd_name = NULL;
-		i = 0;
-		while (i < command->child_count)
+		data.arg_count = 0;
+		data.j = 1;
+		data.command = global->tree->children[0];
+		data.cmd_name = NULL;
+		data.i = 0;
+		while (data.i < data.command->child_count)
 		{
-			if (command->children[i]->type == NODE_WORD)
-				cmd_name = command->children[i]->value;
-			else if (command->children[i]->type == NODE_ARGUMENT)
-				arg_count = command->children[i]->child_count;
-			i++;
+			if (data.command->children[i]->type == NODE_WORD)
+				data.cmd_name = data.command->children[i]->value;
+			else if (data.command->children[i]->type == NODE_ARGUMENT)
+				data.arg_count = data.command->children[i]->child_count;
+			data.i++;
 		}
-		args = malloc(sizeof(char *) * (arg_count + 2));
-		args[0] = cmd_name;
-		j = 1;
-		i = 0;
-		while (i < command->child_count)
+		data.args = malloc(sizeof(char *) * (data.arg_count + 2));
+		data.args[0] = data.cmd_name;
+		data.j = 1;
+		data.i = 0;
+		while (data.i < data.command->child_count)
 		{
-			if (command->children[i]->type == NODE_ARGUMENT)
+			if (data.command->children[i]->type == NODE_ARGUMENT)
 			{
-				int k = 0;
-				while (k < command->children[i]->child_count)
+				data.k = 0;
+				while (data.k < data.command->children[i]->child_count)
 				{
-					args[j++] = command->children[i]->children[k]->value;
-					k++;
+					data.args[data.j++] = data.command->children[data.i]->children[data.k]->value;
+					data.k++;
 				}
 			}
-			i++;
+			data.i++;
 		}
-		args[j] = NULL;
-		execute_builtins(args, global->env, is_builtins(cmd_name));
-		free(args);
+		data.args[data.j] = NULL;
+		execute_builtins(data.args, global->env, is_builtins(data.cmd_name));
+		free(data.args);
 		return ;
 	}
-	heredoc_pipes = prepare_all_heredocs(global->tree);
-	if (!heredoc_pipes && has_heredocs(global->tree))
+	data.heredoc_pipes = prepare_all_heredocs(global->tree);
+	if (!data.heredoc_pipes && has_heredocs(global->tree))
 	{
 		perror("heredoc preparation failed");
 		return ;
 	}
-	prev_pipe[0] = -1;
-	prev_pipe[1] = -1;
-	i = 0;
-	while (i < global->tree->child_count)
+	data.prev_pipe[0] = -1;
+	data.prev_pipe[1] = -1;
+	data.i = 0;
+	while (data.i < global->tree->child_count)
 	{
-		command = global->tree->children[i];
-		if (i < global->tree->child_count - 1)
+		data.command = global->tree->children[i];
+		if (data.i < global->tree->child_count - 1)
 		{
-			if (pipe(curr_pipe) == -1)
+			if (pipe(data.curr_pipe) == -1)
 			{
 				perror("pipe");
-				cleanup_heredoc_pipes(heredoc_pipes, global->tree->child_count);
+				cleanup_heredoc_pipes(data.heredoc_pipes, global->tree->child_count);
 				return ;
 			}
 		}
-		pid = fork();
-		if (pid == 0)
+		data.pid = fork();
+		if (data.pid == 0)
 		{
-			if (heredoc_pipes[i] != -1)
+			if (data.heredoc_pipes[data.i] != -1)
 			{
-				dup2(heredoc_pipes[i], STDIN_FILENO);
-				close(heredoc_pipes[i]);
-				heredoc_pipes[i] = -1;
+				dup2(data.heredoc_pipes[i], STDIN_FILENO);
+				close(data.heredoc_pipes[i]);
+				data.heredoc_pipes[i] = -1;
 			}
 			else if (prev_pipe[0] != -1)
 			{
