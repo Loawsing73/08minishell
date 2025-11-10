@@ -1,44 +1,44 @@
 #include "../../includes/minishell.h"
 /* si | alors crée node avce token PIPE*/
-int	is_pipe(t_lexem **head, t_cursor *cursor)
+int	is_pipe(t_global *global)
 {
 	t_token	token;
 
-	token = get_token(cursor->input[cursor->position]);
+	token = get_token(global->cursor->input[global->cursor->position]);
 	if (token != PIPE)
 		token = WORD;
-	*head = create_node(*head, token,
-			ft_substr(cursor->input, cursor->position, 1));
-	switch_token(token, cursor);
+	global->head = create_node(global->head, token,
+			ft_substr(global->cursor->input, global->cursor->position, 1));//free
+	switch_token(token, global);
 	return (1);
 }
 /*si >, <, >> alors token IO_LOCA car redirection
 si << alors token DELIMITER
 sinon, on va jusqu'au premier oprateur et créee node word avec substr de l'input*/
-int	is_word(t_lexem **head, t_cursor *cu)
+int	is_word(t_global *gl)
 {
 	t_token	token;
 	t_index	data;
 	int		index;
 
 	token = WORD;
-	data.pipe = get_index(cu->position, cu->input, '|') - cu->position;
-	data.less = get_index(cu->position, cu->input, '<') - cu->position;
-	data.great = get_index(cu->position, cu->input, '>') - cu->position;
-	data.space = get_space(cu->position, cu->input) - cu->position;
-	if (cu->current == GREAT || cu->current == D_GREAT || cu->current == LESS)
+	data.pipe = get_index(gl->cursor->position, gl->cursor->input, '|') - gl->cursor->position;
+	data.less = get_index(gl->cursor->position, gl->cursor->input, '<') - gl->cursor->position;
+	data.great = get_index(gl->cursor->position, gl->cursor->input, '>') - gl->cursor->position;
+	data.space = get_space(gl->cursor->position, gl->cursor->input) - gl->cursor->position;
+	if (gl->cursor->current == GREAT || gl->cursor->current == D_GREAT || gl->cursor->current == LESS)
 	{
 		token = IO_LOCA;
 	 	index = data.space;
 	}
-	else if (cu->current == D_LESS)
+	else if (gl->cursor->current == D_LESS)
 	{
 		token = DELIMITER;
 	 	index = data.space;
 	}
-	else if (cu->current == ERROR)
+	else if (gl->cursor->current == ERROR)
 		index = data.space;
-	else if  (data.pipe < data.less && data.pipe < data.great && data.pipe > -1 && cu->current != PIPE)
+	else if  (data.pipe < data.less && data.pipe < data.great && data.pipe > -1 && gl->cursor->current != PIPE)
 		index = data.pipe;
 	else if  (data.less < data.pipe && data.less < data.great && data.less > -1)
 		index = data.less;
@@ -46,56 +46,56 @@ int	is_word(t_lexem **head, t_cursor *cu)
 		index = data.great;
 	else
 		index = data.space;
-	*head = create_node(*head, token,
-			ft_substr(cu->input, cu->position, index));
-	return (switch_token(token, cu), index);
+	gl->head = create_node(gl->head, token,
+			ft_substr(gl->cursor->input, gl->cursor->position, index)); //free
+	return (switch_token(token, gl), index);
 }
 /*si < crée node LESS
 si << crée node DLESS*/
-int	is_less(t_lexem **head, t_cursor *cursor)
+int	is_less(t_global *global)
 {
 	t_token	token;
 	int		position;
 
-	position = cursor->position;
-	token = get_token(cursor->input[position]);
-	if (get_token(cursor->input[position +1]) == token)
+	position = global->cursor->position;
+	token = get_token(global->cursor->input[position]);
+	if (get_token(global->cursor->input[position +1]) == token)
 	{
 		token = D_LESS;
 		position++;
-		*head = create_node(*head, token,
-				ft_substr(cursor->input, cursor->position, 2));
-		return (switch_token(token, cursor), 2);
+		global->head = create_node(global->head, token,
+				ft_substr(global->cursor->input, global->cursor->position, 2)); //free
+		return (switch_token(token, global), 2);
 	}
 	else
 	{
-		*head = create_node(*head, token,
-				ft_substr(cursor->input, cursor->position, 1));
-		return (switch_token(token, cursor), 1);
+		global->head = create_node(global->head, token,
+				ft_substr(global->cursor->input, global->cursor->position, 1)); //free
+		return (switch_token(token, global), 1);
 	}
 }
 /*si >crée node GREAT
 si >> crée node DGREAT*/
-int	is_great(t_lexem **head, t_cursor *cursor)
+int	is_great(t_global *global)
 {
 	t_token	token;
 	int		position;
 
-	position = cursor->position;
-	token = get_token(cursor->input[position]);
-	if (get_token(cursor->input[position + 1]) == token)
+	position = global->cursor->position;
+	token = get_token(global->cursor->input[position]);
+	if (get_token(global->cursor->input[position + 1]) == token)
 	{
 		token = D_GREAT;
 		position++;
-		*head = create_node(*head, token,
-				ft_substr(cursor->input, cursor->position, 2));
-		return (switch_token(token, cursor), 2);
+		global->head = create_node(global->head, token,
+				ft_substr(global->cursor->input, global->cursor->position, 2)); //free
+		return (switch_token(token, global), 2);
 	}
 	else
 	{
-		*head = create_node(*head, token,
-				ft_substr(cursor->input, cursor->position, 1));
-		return (switch_token(token, cursor), 1);
+		global->head = create_node(global->head, token,
+				ft_substr(global->cursor->input, global->cursor->position, 1)); //free
+		return (switch_token(token, global), 1);
 	}
 }
 /*ret index de char c dans string*/
@@ -135,10 +135,10 @@ t_token	get_token(char c)
 		return (ERROR);
 }
 /*actualise token actuel et token précédent*/
-void	switch_token(t_token token, t_cursor *cursor)
+void	switch_token(t_token token, t_global *global)
 {
-	cursor->previous = cursor->current;
-	cursor->current = token;
+	global->cursor->previous = global->cursor->current;
+	global->cursor->current = token;
 }
 
 t_lexem	*create_node(t_lexem *head, t_token token, char *input)
@@ -150,7 +150,7 @@ t_lexem	*create_node(t_lexem *head, t_token token, char *input)
 	if (!node)
 		return (head);
 	node->token = token;
-	node->input = ft_strdup(input);
+	node->input = ft_strdup(input); //free 
 	node->next = NULL;
 	if (!head)
 		return (node);
@@ -167,7 +167,7 @@ si <, <<, >, >> crée node correpondant
 else c'est un word*/
 t_lexem *parsing_input(t_global *global)
 {
-	global->cursor->input = ft_strdup(global.input); //free global.iput
+	global->cursor->input = ft_strdup(global->input); //free global.iput
 	global->cursor->position = 0;
 	global->cursor->previous = ERROR;
 	global->cursor->current = ERROR;
@@ -194,7 +194,7 @@ void	free_lexem_list(t_global *global)
 	t_lexem	*current;
 	t_lexem	*next;
 
-	current = head;
+	current = global->head; 
 	while (current)
 	{
 		next = current->next;
