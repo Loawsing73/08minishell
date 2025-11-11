@@ -8,6 +8,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/wait.h>
+# include <signal.h>
 
 
 # include "parsing.h"
@@ -16,5 +17,6 @@
 # include "exec.h"
 # include "env.h"
 # include "ft_free.h"
+# include "handler.h"
 
 #endif

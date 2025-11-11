@@ -35,7 +35,8 @@ SRCS = src/main.c \
 	   src/exec/execute_ast.c \
 	   src/env/create_env.c \
 	   src/env/env_utils.c \
-	   src/ft_free/ft_free.c
+	   src/ft_free/ft_free.c \
+	   src/handler/handler.c
 
 
 OBJS = $(SRCS:.c=.o)

@@ -8,13 +8,17 @@ int main(int ac, char **ag, char **env)
 	t_env	*new_env;
 	//t_lexem *current;
 	t_cursor cursor = {0};
+	struct sigaction control_c;
 
 	(void)ac;
 	(void)ag;
+	init_handler(control_c);
 	new_env = create_env(env);
 	while (1)
 	{
 		input = readline("minishell >> ");
+		if (!input)
+			break;
 		if (*input == '\0')
 			continue ;
 		/*if (ft_strncmp(input, "exit", ft_strlen(input)) == 0)
