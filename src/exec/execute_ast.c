@@ -358,15 +358,15 @@ static void execute_pipeline(t_global *global)
 	{
 		data.command = global->tree->children[0];
 		data.cmd_name = NULL;
-		data.i = 0;
-		while (data.i < data.command->child_count)
+		i = 0;
+		while (i < data.command->child_count)
 		{
 			if (data.command->children[i]->type == NODE_WORD)
 			{
 				data.cmd_name = data.command->children[i]->value;
 				break ;
 			}
-			data.i++;
+			i++;
 		}
 		if (data.cmd_name && is_builtins(data.cmd_name))
 			data.is_single_builtin = 1;
@@ -374,36 +374,36 @@ static void execute_pipeline(t_global *global)
 	if (data.is_single_builtin)
 	{
 		data.arg_count = 0;
-		data.j = 1;
+		j = 1;
 		data.command = global->tree->children[0];
 		data.cmd_name = NULL;
-		data.i = 0;
-		while (data.i < data.command->child_count)
+		i = 0;
+		while (i < data.command->child_count)
 		{
 			if (data.command->children[i]->type == NODE_WORD)
 				data.cmd_name = data.command->children[i]->value;
 			else if (data.command->children[i]->type == NODE_ARGUMENT)
 				data.arg_count = data.command->children[i]->child_count;
-			data.i++;
+			i++;
 		}
 		data.args = malloc(sizeof(char *) * (data.arg_count + 2));
 		data.args[0] = data.cmd_name;
-		data.j = 1;
-		data.i = 0;
-		while (data.i < data.command->child_count)
+		j = 1;
+		i = 0;
+		while (i < data.command->child_count)
 		{
 			if (data.command->children[i]->type == NODE_ARGUMENT)
 			{
-				data.k = 0;
+				k = 0;
 				while (data.k < data.command->children[i]->child_count)
 				{
-					data.args[data.j++] = data.command->children[data.i]->children[data.k]->value;
-					data.k++;
+					data.args[j++] = data.command->children[i]->children[k]->value;
+					k++;
 				}
 			}
-			data.i++;
+			i++;
 		}
-		data.args[data.j] = NULL;
+		data.args[j] = NULL;
 		execute_builtins(data.args, global->env, is_builtins(data.cmd_name));
 		free(data.args);
 		return ;
@@ -416,11 +416,11 @@ static void execute_pipeline(t_global *global)
 	}
 	data.prev_pipe[0] = -1;
 	data.prev_pipe[1] = -1;
-	data.i = 0;
-	while (data.i < global->tree->child_count)
+	i = 0;
+	while (i < global->tree->child_count)
 	{
 		data.command = global->tree->children[i];
-		if (data.i < global->tree->child_count - 1)
+		if (i < global->tree->child_count - 1)
 		{
 			if (pipe(data.curr_pipe) == -1)
 			{
