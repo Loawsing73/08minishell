@@ -12,7 +12,14 @@ int main(int ac, char **ag, char **env)
 
 	(void)ac;
 	(void)ag;
-	init_handler(control_c);
+	control_c.sa_handler = handle_c;
+	sigemptyset(&control_c.sa_mask);
+	control_c.sa_flags = 0;
+	sigaction(SIGINT, &control_c, NULL);
+    control_c.sa_handler = SIG_IGN;
+    sigemptyset(&control_c.sa_mask);
+    control_c.sa_flags = 0;
+    sigaction(SIGQUIT, &control_c, NULL);
 	new_env = create_env(env);
 	while (1)
 	{
