@@ -8,18 +8,10 @@ int main(int ac, char **ag, char **env)
 	t_env	*new_env;
 	//t_lexem *current;
 	t_cursor cursor = {0};
-	struct sigaction control_c;
 
 	(void)ac;
 	(void)ag;
-	control_c.sa_handler = handle_c;
-	sigemptyset(&control_c.sa_mask);
-	control_c.sa_flags = 0;
-	sigaction(SIGINT, &control_c, NULL);
-    control_c.sa_handler = SIG_IGN;
-    sigemptyset(&control_c.sa_mask);
-    control_c.sa_flags = 0;
-    sigaction(SIGQUIT, &control_c, NULL);
+	init_sig();
 	new_env = create_env(env);
 	while (1)
 	{

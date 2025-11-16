@@ -350,6 +350,9 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 	char		**args;
 	int			arg_count;
 	int			j;
+	struct sigaction    sa;
+    struct sigaction    sa_ignore;
+    struct sigaction    sa_prompt;
 
 	is_single_builtin = 0;
 	if (pipeline->child_count == 1)
@@ -412,6 +415,11 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 		perror("heredoc preparation failed");
 		return ;
 	}
+    sa_ignore.sa_handler = SIG_IGN;
+    sigemptyset(&sa_ignore.sa_mask);
+    sa_ignore.sa_flags = 0;
+    sigaction(SIGINT, &sa_ignore, NULL);
+    sigaction(SIGQUIT, &sa_ignore, NULL);
 	prev_pipe[0] = -1;
 	prev_pipe[1] = -1;
 	i = 0;
@@ -430,6 +438,11 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 		pid = fork();
 		if (pid == 0)
 		{
+			sa.sa_handler = SIG_DFL;
+    		sigemptyset(&sa.sa_mask);
+    		sa.sa_flags = 0;
+    		sigaction(SIGINT, &sa, NULL);
+    		sigaction(SIGQUIT, &sa, NULL);
 			if (heredoc_pipes[i] != -1)
 			{
 				dup2(heredoc_pipes[i], STDIN_FILENO);
@@ -478,6 +491,12 @@ static void execute_pipeline(t_ast_node *pipeline, t_env *new_env)
 		wait(NULL);
 		i++;
 	}
+
+    sa_prompt.sa_handler = handle_c;
+    sa_prompt.sa_flags = SA_RESTART;
+    sigaction(SIGINT, &sa_prompt, NULL);
+    sa_prompt.sa_handler = SIG_IGN;
+    sigaction(SIGQUIT, &sa_prompt, NULL);
 }
 
 void execute_ast(t_ast_node *node, t_env *env)
