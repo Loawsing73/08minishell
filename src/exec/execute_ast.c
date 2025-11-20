@@ -340,10 +340,10 @@ puis regarde si c'est builtin*/
 static void execute_pipeline(t_global *global)
 {
 	t_pipeline	data;
-	int			i;
+	/*int			i;
 	int			j;
 	int			k;
-	/*int			prev_pipe[2];
+	int			prev_pipe[2];
 	int			curr_pipe[2];
 	pid_t		pid;
 	t_ast_node	*command;
@@ -355,26 +355,11 @@ static void execute_pipeline(t_global *global)
 
 	data.is_single_builtin = 0;
 	if (global->tree->child_count == 1)
-	{
-		data.command = global->tree->children[0];
-		data.cmd_name = NULL;
-		i = 0;
-		while (i < data.command->child_count)
-		{
-			if (data.command->children[i]->type == NODE_WORD)
-			{
-				data.cmd_name = data.command->children[i]->value;
-				break ;
-			}
-			i++;
-		}
-		if (data.cmd_name && is_builtins(data.cmd_name))
-			data.is_single_builtin = 1;
-	}
+		execute_pipeline_1(global, &data);
 	if (data.is_single_builtin)
 	{
 		data.arg_count = 0;
-		j = 1;
+		data.j = 1;
 		data.command = global->tree->children[0];
 		data.cmd_name = NULL;
 		i = 0;
