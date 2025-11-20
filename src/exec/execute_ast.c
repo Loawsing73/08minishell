@@ -362,33 +362,33 @@ static void execute_pipeline(t_global *global)
 		data.j = 1;
 		data.command = global->tree->children[0];
 		data.cmd_name = NULL;
-		i = 0;
-		while (i < data.command->child_count)
+		data.i = 0;
+		while (data.i < data.command->child_count)
 		{
-			if (data.command->children[i]->type == NODE_WORD)
-				data.cmd_name = data.command->children[i]->value;
-			else if (data.command->children[i]->type == NODE_ARGUMENT)
-				data.arg_count = data.command->children[i]->child_count;
-			i++;
+			if (data.command->children[data.i]->type == NODE_WORD)
+				data.cmd_name = data.command->children[data.i]->value;
+			else if (data.command->children[data.i]->type == NODE_ARGUMENT)
+				data.arg_count = data.command->children[data.i]->child_count;
+			data.i++;
 		}
 		data.args = malloc(sizeof(char *) * (data.arg_count + 2));
 		data.args[0] = data.cmd_name;
-		j = 1;
-		i = 0;
-		while (i < data.command->child_count)
+		data.j = 1;
+		data.i = 0;
+		while (data.i < data.command->child_count)
 		{
-			if (data.command->children[i]->type == NODE_ARGUMENT)
+			if (data.command->children[data.i]->type == NODE_ARGUMENT)
 			{
-				k = 0;
-				while (data.k < data.command->children[i]->child_count)
+				data.k = 0;
+				while (data.k < data.command->children[data.i]->child_count)
 				{
-					data.args[j++] = data.command->children[i]->children[k]->value;
-					k++;
+					data.args[data.j++] = data.command->children[data.i]->children[data.k]->value;
+					data.k++;
 				}
 			}
-			i++;
+			data.i++;
 		}
-		data.args[j] = NULL;
+		data.args[data.j] = NULL;
 		execute_builtins(data.args, global->env, is_builtins(data.cmd_name));
 		free(data.args);
 		return ;
@@ -401,11 +401,11 @@ static void execute_pipeline(t_global *global)
 	}
 	data.prev_pipe[0] = -1;
 	data.prev_pipe[1] = -1;
-	i = 0;
-	while (i < global->tree->child_count)
+	data.i = 0;
+	while (data.i < global->tree->child_count)
 	{
-		data.command = global->tree->children[i];
-		if (i < global->tree->child_count - 1)
+		data.command = global->tree->children[data.i];
+		if (data.i < global->tree->child_count - 1)
 		{
 			if (pipe(data.curr_pipe) == -1)
 			{
@@ -419,9 +419,9 @@ static void execute_pipeline(t_global *global)
 		{
 			if (data.heredoc_pipes[data.i] != -1)
 			{
-				dup2(data.heredoc_pipes[i], STDIN_FILENO);
-				close(data.heredoc_pipes[i]);
-				data.heredoc_pipes[i] = -1;
+				dup2(data.heredoc_pipes[data.i], STDIN_FILENO);
+				close(data.heredoc_pipes[data.i]);
+				data.heredoc_pipes[data.i] = -1;
 			}
 			else if (prev_pipe[0] != -1)
 			{
@@ -429,7 +429,7 @@ static void execute_pipeline(t_global *global)
 				close(prev_pipe[0]);
 				close(prev_pipe[1]);
 			}
-			if (i < global->tree->child_count - 1)
+			if (data.i < global->tree->child_count - 1)
 			{
 				close(curr_pipe[0]);
 				dup2(curr_pipe[1], STDOUT_FILENO);
@@ -456,14 +456,14 @@ static void execute_pipeline(t_global *global)
 			prev_pipe[0] = curr_pipe[0];
 			prev_pipe[1] = -1;
 		}
-		i++;
+		data.i++;
 	}
 	cleanup_heredoc_pipes(heredoc_pipes, global->tree->child_count);
-	i = 0;
-	while (i < global->tree->child_count)
+	data.i = 0;
+	while (data.i < global->tree->child_count)
 	{
 		wait(NULL);
-		i++;
+		data.i++;
 	}
 }
 
