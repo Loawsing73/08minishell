@@ -19,7 +19,8 @@ typedef struct s_pipeline {
 } t_pipeline;
 
 void	execute_ast(t_global *global);
-void    execute_pipeline_1(t_global *global, t_pipeline *data, int *i);
+void	execute_pipeline_1(t_global *global, t_pipeline *data);
+void    execute_pipeline_2(t_global *global, t_pipeline *data);
 int		is_builtins(char *cmd);
 
 #endif

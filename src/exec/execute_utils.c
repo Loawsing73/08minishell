@@ -21,37 +21,36 @@ void    execute_pipeline_1(t_global *global, t_pipeline *data)
 void    execute_pipeline_2(t_global *global, t_pipeline *data)
 {
     data->arg_count = 0;
-    data.j = 1;
-	data.command = global->tree->children[0];
-	data.cmd_name = NULL;
-	data.i = 0;
-	while (data.i < data.command->child_count)
+    data->j = 1;
+	data->command = global->tree->children[0];
+	data->cmd_name = NULL;
+	data->i = 0;
+	while (data->i < data->command->child_count)
 	{
-		if (data.command->children[data.i]->type == NODE_WORD)
-			data.cmd_name = data.command->children[data.i]->value;
-		else if (data.command->children[data.i]->type == NODE_ARGUMENT)
-			data.arg_count = data.command->children[data.i]->child_count;
-		data.i++;
+		if (data->command->children[data->i]->type == NODE_WORD)
+			data->cmd_name = data.command->children[data->i]->value;
+		else if (data->command->children[data->i]->type == NODE_ARGUMENT)
+			data->arg_count = data->command->children[data.i]->child_count;
+		data->i++;
 	}
-	data.args = malloc(sizeof(char *) * (data.arg_count + 2));
-	data.args[0] = data.cmd_name;
-	data.j = 1;
-	data.i = 0;
-	while (data.i < data.command->child_count)
+	data->args = malloc(sizeof(char *) * (data->arg_count + 2));
+	data->args[0] = data->cmd_name;
+	data->j = 1;
+	data->i = 0;
+	while (data->i < data->command->child_count)
 	{
-		if (data.command->children[data.i]->type == NODE_ARGUMENT)
+		if (data->command->children[data->i]->type == NODE_ARGUMENT)
 		{
-			data.k = 0;
-			while (data.k < data.command->children[data.i]->child_count)
+			data->k = 0;
+			while (data->k < data->command->children[data->i]->child_count)
 			{
-				data.args[data.j++] = data.command->children[data.i]->children[data.k]->value;
-				data.k++;
+				data.args[data->j++] = data.command->children[data->i]->children[data.k]->value;
+				data->k++;
 			}
 		}
-		data.i++;
+		data->i++;
 	}
-	data.args[data.j] = NULL;
-	execute_builtins(data.args, global->env, is_builtins(data.cmd_name));
-	free(data.args);
-	return ;
+	data->args[data->j] = NULL;
+	execute_builtins(data->args, global->env, is_builtins(data->cmd_name));
+	free(data->args);
 }

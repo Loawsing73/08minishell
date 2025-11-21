@@ -340,57 +340,13 @@ puis regarde si c'est builtin*/
 static void execute_pipeline(t_global *global)
 {
 	t_pipeline	data;
-	/*int			i;
-	int			j;
-	int			k;
-	int			prev_pipe[2];
-	int			curr_pipe[2];
-	pid_t		pid;
-	t_ast_node	*command;
-	int			*heredoc_pipes;
-	char		*cmd_name;
-	int			is_single_builtin;
-	char		**args;
-	int			arg_count;*/
 
 	data.is_single_builtin = 0;
 	if (global->tree->child_count == 1)
 		execute_pipeline_1(global, &data);
 	if (data.is_single_builtin)
 	{
-		data.arg_count = 0;
-		data.j = 1;
-		data.command = global->tree->children[0];
-		data.cmd_name = NULL;
-		data.i = 0;
-		while (data.i < data.command->child_count)
-		{
-			if (data.command->children[data.i]->type == NODE_WORD)
-				data.cmd_name = data.command->children[data.i]->value;
-			else if (data.command->children[data.i]->type == NODE_ARGUMENT)
-				data.arg_count = data.command->children[data.i]->child_count;
-			data.i++;
-		}
-		data.args = malloc(sizeof(char *) * (data.arg_count + 2));
-		data.args[0] = data.cmd_name;
-		data.j = 1;
-		data.i = 0;
-		while (data.i < data.command->child_count)
-		{
-			if (data.command->children[data.i]->type == NODE_ARGUMENT)
-			{
-				data.k = 0;
-				while (data.k < data.command->children[data.i]->child_count)
-				{
-					data.args[data.j++] = data.command->children[data.i]->children[data.k]->value;
-					data.k++;
-				}
-			}
-			data.i++;
-		}
-		data.args[data.j] = NULL;
-		execute_builtins(data.args, global->env, is_builtins(data.cmd_name));
-		free(data.args);
+		execute_pipeline_2(global, &data);
 		return ;
 	}
 	data.heredoc_pipes = prepare_all_heredocs(global->tree);
