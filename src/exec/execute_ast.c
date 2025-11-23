@@ -94,7 +94,7 @@ static int has_heredocs(t_ast_node *pipeline)
 	return (0);
 }
 
-static void cleanup_heredoc_pipes(int *heredoc_pipes, int count)
+ 
 {
 	int i;
 
@@ -265,7 +265,7 @@ static char	*find_command_in_path(char *cmd, t_env *env)
 	return (cmd);
 }
 
-static void execute_command(t_global *global)
+void execute_command(t_global *global)
 /*si word = args[0]
 si argument, remplit args[i]
 puis regarde args[0], regarde si cas spécifique (.) 
@@ -337,7 +337,7 @@ puis regarde si c'est builtin*/
 	exit(1);
 }
 
-static void execute_pipeline(t_global *global)
+void execute_pipeline(t_global *global)
 {
 	t_pipeline	data;
 
@@ -345,75 +345,15 @@ static void execute_pipeline(t_global *global)
 	if (global->tree->child_count == 1)
 		execute_pipeline_1(global, &data);
 	if (data.is_single_builtin)
-	{
-		execute_pipeline_2(global, &data);
-		return ;
-	}
+		return (execute_pipeline_2(global, &data));
 	data.heredoc_pipes = prepare_all_heredocs(global->tree);
 	if (!data.heredoc_pipes && has_heredocs(global->tree))
-	{
-		perror("heredoc preparation failed");
-		return ;
-	}
+		return (perror("heredoc preparation failed"));
 	data.prev_pipe[0] = -1;
 	data.prev_pipe[1] = -1;
 	data.i = 0;
-	while (data.i < global->tree->child_count)
-	{
-		data.command = global->tree->children[data.i];
-		if (data.i < global->tree->child_count - 1)
-		{
-			if (pipe(data.curr_pipe) == -1)
-			{
-				perror("pipe");
-				cleanup_heredoc_pipes(data.heredoc_pipes, global->tree->child_count);
-				return ;
-			}
-		}
-		data.pid = fork();
-		if (data.pid == 0)
-		{
-			if (data.heredoc_pipes[data.i] != -1)
-			{
-				dup2(data.heredoc_pipes[data.i], STDIN_FILENO);
-				close(data.heredoc_pipes[data.i]);
-				data.heredoc_pipes[data.i] = -1;
-			}
-			else if (prev_pipe[0] != -1)
-			{
-				dup2(prev_pipe[0], STDIN_FILENO);
-				close(prev_pipe[0]);
-				close(prev_pipe[1]);
-			}
-			if (data.i < global->tree->child_count - 1)
-			{
-				close(curr_pipe[0]);
-				dup2(curr_pipe[1], STDOUT_FILENO);
-				close(curr_pipe[1]);
-			}
-			cleanup_heredoc_pipes(heredoc_pipes, global->tree->child_count);
-			if (command->type == NODE_PIPELINE)
-        		execute_pipeline(command, global->env);  // Récursif
-    		else if (command->type == NODE_COMMAND)
-        		execute_command(command, global->env);
-    		else
-				exit(1);
-			exit(0);
-		}
-		if (prev_pipe[0] != -1)
-		{
-			close(prev_pipe[0]);
-			if (prev_pipe[1] != -1)
-        		close(prev_pipe[1]);
-		}
-		if (i < global->tree->child_count - 1)
-		{
-			close(curr_pipe[1]);
-			prev_pipe[0] = curr_pipe[0];
-			prev_pipe[1] = -1;
-		}
-		data.i++;
-	}
+	if (execute_pipeline_3(global, &data) == 1)
+		return ;
 	cleanup_heredoc_pipes(heredoc_pipes, global->tree->child_count);
 	data.i = 0;
 	while (data.i < global->tree->child_count)

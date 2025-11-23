@@ -19,8 +19,13 @@ typedef struct s_pipeline {
 } t_pipeline;
 
 void	execute_ast(t_global *global);
+void 	execute_command(t_global *global);
+void 	cleanup_heredoc_pipes(int *heredoc_pipes, int count);µ
+void    child_process(t_global *global, t_pipeline *data);
+void 	execute_pipeline(t_global *global);
 void	execute_pipeline_1(t_global *global, t_pipeline *data);
 void    execute_pipeline_2(t_global *global, t_pipeline *data);
+int		execute_pipeline_3(t_global *global, t_pipeline *data);
 int		is_builtins(char *cmd);
 
 #endif
