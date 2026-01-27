@@ -67,43 +67,12 @@ typedef struct s_parser
     t_ast_node *root;
 }       t_parser;
 
-//parser.c
-t_ast_node	*create_node_ast(t_node_type type, char *value);
-void		add_child(t_ast_node *parent, t_ast_node *child);
-void		free_ast(t_ast_node *node);
-int		is_redirection_token(t_token token);
-int		is_argument_token(t_token token);
-void		consum_token(t_parser *parser);
-int		match_token(t_parser *parser, t_token expected);
-t_ast_node	*parse_pipeline(t_parser *parser);
-t_ast_node	*parse_command(t_parser *parser);
-t_ast_node	*parse_argument_list(t_parser *parser);
-t_ast_node	*parse_argument(t_parser *parser);
-t_ast_node	*parse_redirection_list(t_parser *parser);
-t_ast_node	*parse_redirection(t_parser *parser);
-t_ast_node	*parse_word(t_parser *parser);
-t_ast_node	*parse(t_global *global);
+typedef struct s_indexx
+{
+        int     i;
+        int     j;
+        int     k;
+}       t_indexx;
 
-//rendering.c
-void print_ast(t_ast_node *node, int indent);
-
-//tokenization.c
-int	is_pipe(t_lexem **head, t_cursor *cursor);
-int	is_word(t_lexem **head, t_cursor *cu);
-int	is_less(t_lexem **head, t_cursor *cursor);
-int	is_great(t_lexem **head, t_cursor *cursor);
-int	get_index(int position, char *s, char c);
-int	get_space(int position, char *s);
-t_token	get_token(char c);
-void	switch_token(t_token token, t_cursor *cursor);
-t_lexem	*create_node(t_lexem *head, t_token token, char *input);
-t_lexem *parsing_input(t_global *global);
-void	free_lexem_list(t_global *global);
-
-//trim_expand.c
-char	*concate_hell(char *expanded_input, t_global *global);
-
-//valid.c
-int	valid_input(char *input);
 
 #endif

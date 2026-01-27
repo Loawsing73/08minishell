@@ -337,7 +337,7 @@ t_ast_node	*parse(t_global *global)
 {
 	t_parser	parser;
 
-	parser.current = global->lexem;
+	parser.current = global->head;
 	parser.root = NULL;
 	parser.root = parse_pipeline(&parser);
 	return (parser.root);

@@ -56,95 +56,91 @@ static char	*find_within_env(char **env, char *var_name)
 }
 */
 
-static int	expand_variable(char *s, char *d, int *i, int *j, t_env *env)
+static int	expand_variable(char *s, char *d, t_indexx *i, t_env *env)
 {
 	char	*var_name;
 	char	*var_value;
-	int		k;
-	int		var_start;
 
-	if (s[*i] != '$' || s[(*i) + 1] == '$')
+	if (s[i->i] != '$' || s[(i->i) + 1] == '$')
 		return (0);
-	var_start = *i + 1;
-	var_name = extract_variable_input(s, var_start);
+	var_name = extract_variable_input(s, i->i + 1); // free var_name
 	if (var_name)
 	{
 		var_value = get_var(var_name, env);
 		if (var_value)
 		{
-			k = -1;
-			while (var_value[++k])
+			while (var_value[++(i->k)])
 			{
-				d[*j] = var_value[k];
-				(*j)++;
+				d[i->j] = var_value[i->k];
+				(i->j)++;
 			}
-			*i = skip_variable(s, var_start);
+			i->i = skip_variable(s, i->i + 1);
 		}
 		else
 		{
-			d[*j] = ' ';
-			*i = skip_variable(s, var_start);
+			d[i->j] = ' ';
+			i->i = skip_variable(s, i->i + 1);
 		}
 		return (free(var_name), 1);
 	}
 	return (0);
 }
 
-static void	filldquote(char *s, char *d, int *i, int *j, t_env *env)
+static void	filldquote(char *s, char *d, t_indexx *i, t_env *env)
 {
 	int	limit;
 
-	(*i)++;
-	limit = get_index(*i, s, '"');
-	while ((*i) < limit)
+	(i->i)++;
+	limit = get_index(i->i, s, '"');
+	while ((i->i) < limit)
 	{
-		if (s[*i] == '$' && s[(*i) + 1] != '$')
+		if (s[i->i] == '$' && s[(i->i) + 1] != '$')
 		{
-			if (!expand_variable(s, d, i, j, env))
+			if (!expand_variable(s, d, i, env))
 			{
-				d[*j] = -s[*i];
-				(*j)++;
-				(*i)++;
+				d[i->j] = -s[i->i];
+				(i->j)++;
+				(i->i)++;
 			}
 		}
 		else
 		{
-			d[*j] = -s[*i];
-			(*j)++;
-			(*i)++;
+			d[i->j] = -s[i->i];
+			(i->j)++;
+			(i->i)++;
 		}
 	}
-	(*i)++;
+	(i->i)++;
 }
 
-static void	fill_exp_dquote(char *s, char *d, int *i, int *j)
+static void	fill_exp_dquote(char *s, char *d, t_indexx *i)
 {
 	int	limit;
 
-	(*i)++;
-	limit = get_index(*i, s, '"');
-	while ((*i) < limit)
+	(i->i)++;
+	limit = get_index(i->i, s, '"');
+	while ((i->i) < limit)
 	{
-		d[*j] = -s[*i];
-		(*j)++;
-		(*i)++;
+		d[i->j] = -s[i->i];
+		(i->j)++;
+		(i->i)++;
 	}
-	(*i)++;
+	(i->i)++;
 }
 
-static void fillquote(char *s, char *d, int *i, int *j)
+static void fillquote(char *s, char *d, t_indexx *i)
 {
-	(*i)++;
-	while (s[*i] != '\'' && s[*i])
+	(i->i)++;
+	while (s[i->i] != '\'' && s[i->i])
 	{
-		if (s[*i] == '>' || s[*i] == '<' || s[*i] == '|')
-			d[*i] = -s[*i];
+		if (s[i->i] == '>' || s[i->i] == '<' || s[i->i] == '|')
+			d[i->i] = -s[i->i];
 		else
-			d[*j] = s[*i];
-		(*i)++;
-		(*j)++;
+			d[i->j] = s[i->i];
+		(i->i)++;
+		(i->j)++;
 	}
-	(*i)++;
+	(i->i)++;
 }
 
 static int	max_env(t_env *env, char *s)
@@ -163,27 +159,27 @@ static int	max_env(t_env *env, char *s)
 	return (max + 100);
 }
 
-static void	fill(char *s, char *d, int *i, int *j)
+static void	fill(char *s, char *d, t_indexx *i)
 {
-	d[*j] = s[*i];
-	(*i)++;
-	(*j)++;
+	d[i->j] = s[i->i];
+	(i->i)++;
+	(i->j)++;
 }
 
-static void	expand_heredoc(char *s, char *d, int *i, int *j)
+static void	expand_heredoc(char *s, char *d, t_indexx *i)
 {
-	fill(s, d, i, j);
-	fill(s, d, i, j);
-	while (s[*i] == ' ')
-		(*i)++;
-	while ((*i) != get_space(*i, s))
+	fill(s, d, i);
+	fill(s, d, i);
+	while (s[i->i] == ' ')
+		(i->i)++;
+	while ((i->i) != get_space(i->i, s))
 	{
-		if (s[*i] == '\'')
-			fillquote(s, d, i, j);
-		else if (s[*i] == '"')
-			fill_exp_dquote(s, d, i, j);
+		if (s[i->i] == '\'')
+			fillquote(s, d, i);
+		else if (s[i->i] == '"')
+			fill_exp_dquote(s, d, i);
 		else
-			fill(s, d, i, j);
+			fill(s, d, i);
 	}
 }
 
@@ -206,38 +202,38 @@ static int	consecutive_angbra(char *s, int i)
 */
 char	*concate_hell(char *expanded_input, t_global *global)
 {
-	int i;
-	int j;
-	char *stash;
+	t_indexx	i;
+	char		*stash;
 	
-	i = 0;
-	j = 0;
-	stash = malloc(sizeof(char) * max_env(global->env, expanded_input));
+	i.i = 0;
+	i.j = 0;
+	i.k = -1;
+	stash = malloc(sizeof(char) * max_env(global->env, expanded_input)); //free stash
 	if (!stash)
 		return (NULL);
-	while (expanded_input[i])
+	while (expanded_input[i.i])
 	{
-		if ((expanded_input[i] == '<' || expanded_input[i] == '>') && consecutive_angbra(expanded_input, i))
-			expand_heredoc(expanded_input, stash, &i, &j);
-		else if (expanded_input[i] == '\'' || expanded_input[i] == '"')
+		if ((expanded_input[i.i] == '<' || expanded_input[i.i] == '>') && consecutive_angbra(expanded_input, i.i))
+			expand_heredoc(expanded_input, stash, &i);
+		else if (expanded_input[i.i] == '\'' || expanded_input[i.i] == '"')
 		{
-			if (expanded_input[i] == '\'')
-				fillquote(expanded_input, stash, &i, &j);
-			else if (expanded_input[i] == '"')
-				filldquote(expanded_input, stash, &i, &j, global->env);
+			if (expanded_input[i.i] == '\'')
+				fillquote(expanded_input, stash, &i);
+			else if (expanded_input[i.i] == '"')
+				filldquote(expanded_input, stash, &i, global->env);
 		}
-		else if (expanded_input[i] == '$' && !consecutive_dollar(expanded_input, i))
+		else if (expanded_input[i.i] == '$' && !consecutive_dollar(expanded_input, i.i))
 		{
-			if (!expand_variable(expanded_input, stash, &i, &j, global->env))
-				fill(expanded_input, stash, &i, &j);
+			if (!expand_variable(expanded_input, stash, &i, global->env))
+				fill(expanded_input, stash, &i);
 		}
 		else
 		{
-        	if (expanded_input[i] == '$' && consecutive_dollar(expanded_input, i))
-            	fill(expanded_input, stash, &i, &j);
-        	fill(expanded_input, stash, &i, &j);
+        	if (expanded_input[i.i] == '$' && consecutive_dollar(expanded_input, i.i))
+            	fill(expanded_input, stash, &i);
+        	fill(expanded_input, stash, &i);
 		}
     }
-	stash[j] = '\0';
+	stash[i.j] = '\0';
 	return (stash);
 }

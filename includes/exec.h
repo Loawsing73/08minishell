@@ -3,6 +3,7 @@
 
 #include "minishell.h"
 
+<<<<<<< HEAD
 typedef struct s_pipeline {
 	int			arg_count;
 	int			is_single_builtin;
@@ -96,4 +97,6 @@ void    execute_pipeline_2(t_global *global, t_pipeline *data);
 int		execute_pipeline_3(t_global *global, t_pipeline *data);
 
 
+=======
+>>>>>>> origin/expand_hereoc
 #endif

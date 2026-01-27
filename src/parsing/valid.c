@@ -77,23 +77,7 @@ static int	triple_angbra(char *s)
 	}
 	return (1);
 }
-/*caractere pas pris en charge*/
-static int	special_caract(char *input)
-{
-	int	i;
 
-	i = 0;
-	while (input[i])
-	{
-		if (input[i] == '\\' || input[i] == ';' || input[i] == '*'
-			|| input[i] == '[' || input[i] == ']' || input[i] == '('
-			|| input[i] == '#' || input[i] == '%' || input[i] == '!'
-			|| input[i] == ')')
-			return (0);
-		i++;
-	}
-	return (1);
-}
 /*s'assure que quote bien fermée*/
 static int	ft_quote(char *s, int *i)
 {
@@ -143,6 +127,6 @@ int	valid_input(char *input)
 		else
 			i++;
 	}
-	return (special_caract(input) * quote * dquote * operator_end_beg(input)
+	return (quote * dquote * operator_end_beg(input)
 		* triple_angbra(input) * far_angbra(input) * is_valid_delimiter(input));
 }
